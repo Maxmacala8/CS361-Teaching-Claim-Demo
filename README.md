@@ -50,4 +50,4 @@ Open questions / To validate
     อาจารย์ต้องการเห็นข้อมูลอะไรมากที่สุดก่อนตัดสินใจยื่นเบิก (อัตรา, เอกสาร, หรือกำหนดเวลา)
     ควรรวมข้อมูลของผู้ช่วยสอน (TA) ไว้ในหน้าเดียวกันหรือแยกหน้าตั้งแต่ V1
 
-Link Host(S3):
+Link Host(S3) : http://forhostteaching-claim-demo.s3-website-us-east-1.amazonaws.com/
