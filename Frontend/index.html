@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>สรุปหลักเกณฑ์และกระบวนการเบิกจ่ายค่าตอบแทนการสอน</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/index.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบเบิกค่าตอบแทนการสอน</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
 
@@ -18,6 +19,8 @@
       <a href="#rules">เกณฑ์การนับชั่วโมง</a>
       <a href="#process">กระบวนการเบิกจ่าย</a>
       <a href="#documents">เอกสารประกอบ</a>
+      <a href="#claim">ยื่นคำขอ</a>
+      <a href="#claims">รายการคำขอ</a>
     </nav>
   </div>
 </header>
@@ -28,51 +31,27 @@
     <p class="eyebrow">ประกาศและระเบียบที่เกี่ยวข้อง &middot; ศูนย์ลำปาง</p>
     <h1>หลักเกณฑ์และอัตราการจ่ายเงินค่าตอบแทนการสอน</h1>
     <p class="hero-lede">
-      สรุปข้อมูลตามระเบียบมหาวิทยาลัยธรรมศาสตร์ ว่าด้วยหลักเกณฑ์และอัตราการจ่ายเงินค่าตอบแทนแก่บุคลากรทางการศึกษาของศูนย์ลำปาง พ.ศ. ๒๕๕๑ และระเบียบกระทรวงการคลัง พ.ศ. ๒๕๕๑
+      สรุปข้อมูลตามระเบียบมหาวิทยาลัยธรรมศาสตร์ ว่าด้วยหลักเกณฑ์และอัตราการจ่ายเงินค่าตอบแทนแก่บุคลากรทางการศึกษาของศูนย์ลำปาง พ.ศ. ๒๕๕๑ และระเบียบกระทรวงการคลัง พ.ศ. ๒๕๕๑ พร้อมยื่นคำขอเบิกและติดตามรายการได้ในหน้านี้
     </p>
   </section>
 
-  <!-- หมวด 1: อัตราค่าตอบแทน -->
+  <!-- หมวด 1: ประเภทและอัตราค่าตอบแทน (โหลดจากฐานข้อมูล) -->
   <section id="rates" class="section wrap">
-    <h2><span class="num">01</span>อัตราค่าตอบแทนการสอน (ศูนย์ลำปาง)</h2>
-    <p class="section-lede">สรุปการจ่ายค่าตอบแทนตามบทบาท ลักษณะการสอน และภาคการศึกษา</p>
+    <h2><span class="num">01</span>ประเภทและอัตราค่าตอบแทน</h2>
+    <p class="section-lede">ข้อมูลดึงจากฐานข้อมูลกฎ จึงเพิ่มหรือปรับประเภทค่าตอบแทนได้โดยไม่ต้องแก้โค้ด</p>
 
     <div class="table-card">
       <table>
         <thead>
           <tr>
-            <th>กลุ่มผู้มีสิทธิ์</th>
-            <th>ลักษณะการปฏิบัติงาน / ภาคการศึกษา</th>
-            <th>อัตราค่าตอบแทน</th>
+            <th>ประเภท</th>
+            <th>ผู้มีสิทธิ์</th>
+            <th>เอกสารที่ต้องแนบ</th>
+            <th>อัตรา</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td><strong>อาจารย์ประจำ</strong></td>
-            <td>สอนระดับปริญญาตรี ภาคฤดูร้อน ณ ศูนย์ลำปาง</td>
-            <td class="rate">๔๐๐ บาท / ชม.</td>
-          </tr>
-          <tr>
-            <td rowspan="3"><strong>อาจารย์ที่เดินทางมาปฏิบัติงาน และ ผู้บรรยายพิเศษ</strong></td>
-            <td>
-              สอนระดับปริญญาตรี ภาคปกติ / ภาคฤดูร้อน ณ ศูนย์ลำปาง<br>
-              <small style="color: var(--ink-soft);">* ค่าสอน ๔๐๐ บาท + ค่าสอนนอกพื้นที่ท่าพระจันทร์/รังสิต ๔๐๐ บาท</small>
-            </td>
-            <td class="rate">๘๐๐ บาท / ชม.<br><small>(๔๐๐ + ๔๐๐)</small></td>
-          </tr>
-          <tr>
-            <td>สอนระดับปริญญาตรี โดยใช้อุปกรณ์สื่อการสอนทางไกลมายังศูนย์ลำปาง</td>
-            <td class="rate">๔๐๐ บาท / ชม.</td>
-          </tr>
-          <tr>
-            <td>ผู้บรรยายพิเศษที่มีภูมิลำเนา/ปฏิบัติงานในพื้นที่จังหวัดลำปาง</td>
-            <td class="rate">๔๐๐ บาท / ชม.<br><small>(ไม่ได้ค่านอกพื้นที่)</small></td>
-          </tr>
-          <tr>
-            <td><strong>อาจารย์ผู้เดินทางมาปฏิบัติงาน</strong></td>
-            <td>ปฏิบัติงานเกี่ยวกับการสอบไล่, สอบคัดเลือก, ปฐมนิเทศ, ปัจฉิมนิเทศ</td>
-            <td class="rate">๕๐๐ บาท / คาบเวลา<br><small>(๓ ชม. ขึ้นไป)</small></td>
-          </tr>
+        <tbody id="typeRows">
+          <tr><td colspan="4">กำลังโหลดข้อมูล...</td></tr>
         </tbody>
       </table>
     </div>
@@ -120,7 +99,7 @@
     </div>
   </section>
 
-  <!-- หมวด 3: ขั้นตอนและกระบวนการ -->
+  <!-- หมวด 3: ขั้นตอนกระบวนการ -->
   <section id="process" class="section wrap">
     <h2><span class="num">03</span>ขั้นตอนกระบวนการเบิกจ่าย</h2>
     <p class="section-lede">ภาพรวมลำดับขั้นตอนตั้งแต่เริ่มปฏิบัติงานจนถึงการเบิกจ่ายงบประมาณ</p>
@@ -166,21 +145,106 @@
       <table>
         <tbody>
           <tr>
-            <td style="width: 40px; text-align: center; color: var(--brass);">●</td>
+            <td class="bullet">●</td>
             <td><strong>แบบฟอร์มคำขอเบิกเงินค่าตอบแทน</strong> (ระบุรายวิชา, วันที่, ช่วงเวลา และจำนวนชั่วโมง)</td>
           </tr>
           <tr>
-            <td style="width: 40px; text-align: center; color: var(--brass);">●</td>
+            <td class="bullet">●</td>
             <td><strong>ตารางสอน / ตารางการปฏิบัติงาน</strong> ที่ได้รับอนุมัติจากคณะหรือหน่วยงานต้นสังกัด</td>
           </tr>
           <tr>
-            <td style="width: 40px; text-align: center; color: var(--brass);">●</td>
+            <td class="bullet">●</td>
             <td><strong>บันทึกเวลาปฏิบัติงาน / ใบลงเวลาสอน</strong> (ระบุเวลาเริ่ม-สิ้นสุดชัดเจน)</td>
           </tr>
           <tr>
-            <td style="width: 40px; text-align: center; color: var(--brass);">●</td>
+            <td class="bullet">●</td>
             <td><strong>หนังสือเชิญ / คำสั่งแต่งตั้ง</strong> (กรณีผู้บรรยายพิเศษ หรืออาจารย์ที่เดินทางมาปฏิบัติงาน)</td>
           </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- หมวด 5: ฟอร์มยื่นคำขอ (V2) -->
+  <section id="claim" class="section wrap">
+    <h2><span class="num">05</span>สร้างคำขอเบิกค่าตอบแทน</h2>
+    <p class="section-lede">กรอกข้อมูล แล้วเลือกบันทึกร่างหรือยื่นคำขอ ระบบจะตรวจกฎและคำนวณยอดให้</p>
+
+    <div class="form-card">
+      <label>ชื่อผู้ขอเบิก
+        <input id="name" type="text" autocomplete="name">
+      </label>
+      <label>บทบาท
+        <select id="role">
+          <option value="อาจารย์">อาจารย์/ผู้สอน</option>
+          <option value="TA">ผู้ช่วยสอน (TA)</option>
+        </select>
+      </label>
+      <label>ประเภทค่าตอบแทน
+        <select id="typeSelect"><option value="">กำลังโหลด...</option></select>
+      </label>
+      <label>รายวิชา
+        <input id="course" type="text" placeholder="เช่น CS361">
+      </label>
+      <label>ภาคการศึกษา
+        <select id="term">
+          <option>1/2569</option>
+          <option>2/2569</option>
+          <option>ฤดูร้อน/2569</option>
+        </select>
+      </label>
+      <label>วันที่ปฏิบัติงาน
+        <input id="date" type="date">
+      </label>
+      <label>จำนวนชั่วโมง
+        <input id="hours" type="number" min="0.5" step="0.5">
+      </label>
+
+      <p id="estimate" class="estimate"></p>
+
+      <div class="actions">
+        <button id="btnDraft" class="btn ghost" type="button">บันทึกร่าง</button>
+        <button id="btnSubmit" class="btn" type="button">ยื่นคำขอ</button>
+      </div>
+      <p id="formMsg" class="msg" role="status"></p>
+    </div>
+  </section>
+
+  <!-- หมวด 6: รายการคำขอ (V2) -->
+  <section id="claims" class="section wrap">
+    <h2><span class="num">06</span>รายการคำขอ</h2>
+    <p class="section-lede">ค้นหาและกรองคำขอตามภาคการศึกษาและสถานะ</p>
+
+    <div class="filters">
+      <select id="fTerm" aria-label="กรองตามภาคการศึกษา">
+        <option value="">ทุกภาคการศึกษา</option>
+        <option>1/2569</option>
+        <option>2/2569</option>
+        <option>ฤดูร้อน/2569</option>
+      </select>
+      <select id="fStatus" aria-label="กรองตามสถานะ">
+        <option value="">ทุกสถานะ</option>
+        <option value="DRAFT">ร่าง</option>
+        <option value="SUBMITTED">ยื่นแล้ว</option>
+      </select>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>รหัส</th>
+            <th>ผู้ขอ</th>
+            <th>ประเภท</th>
+            <th>วิชา</th>
+            <th>ภาค</th>
+            <th>ชม.</th>
+            <th>ยอด</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody id="claimRows">
+          <tr><td colspan="8">กำลังโหลดข้อมูล...</td></tr>
         </tbody>
       </table>
     </div>
@@ -194,5 +258,6 @@
   </div>
 </footer>
 
+<script src="js/app.js"></script>
 </body>
 </html>
