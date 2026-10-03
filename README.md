@@ -51,3 +51,5 @@ Open questions / To validate
     ควรรวมข้อมูลของผู้ช่วยสอน (TA) ไว้ในหน้าเดียวกันหรือแยกหน้าตั้งแต่ V1
 
 Link Host(S3) : http://forhostteaching-claim-demo.s3-website-us-east-1.amazonaws.com/
+
+Link Host(S3)ใหม่ : http://cs361-claim-demo-g13.s3-website-us-east-1.amazonaws.com/

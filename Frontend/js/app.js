@@ -1,5 +1,6 @@
 // ใส่ URL ของ API Gateway (Invoke URL) ที่นี่ เช่น https://abc123.execute-api.ap-southeast-1.amazonaws.com
-const API = "https://YOUR_API_ID.execute-api.ap-southeast-1.amazonaws.com";
+
+const API = "https://6n0mb8bvze.execute-api.us-east-1.amazonaws.com";
 
 const $ = (id) => document.getElementById(id);
 let types = [];
