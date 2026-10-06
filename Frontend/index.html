@@ -172,43 +172,64 @@
     <p class="section-lede">กรอกข้อมูล แล้วเลือกบันทึกร่างหรือยื่นคำขอ ระบบจะตรวจกฎและคำนวณยอดให้</p>
 
     <div class="form-card">
-      <label>ชื่อผู้ขอเบิก
-        <input id="name" type="text" autocomplete="name">
-      </label>
-      <label>บทบาท
-        <select id="role">
-          <option value="อาจารย์">อาจารย์/ผู้สอน</option>
-          <option value="TA">ผู้ช่วยสอน (TA)</option>
-        </select>
-      </label>
-      <label>ประเภทค่าตอบแทน
-        <select id="typeSelect"><option value="">กำลังโหลด...</option></select>
-      </label>
-      <label>รายวิชา
-        <input id="course" type="text" placeholder="เช่น CS361">
-      </label>
-      <label>ภาคการศึกษา
-        <select id="term">
-          <option>1/2569</option>
-          <option>2/2569</option>
-          <option>ฤดูร้อน/2569</option>
-        </select>
-      </label>
-      <label>วันที่ปฏิบัติงาน
-        <input id="date" type="date">
-      </label>
-      <label>จำนวนชั่วโมง
-        <input id="hours" type="number" min="0.5" step="0.5">
-      </label>
+  <label>ชื่อผู้ขอเบิก
+    <input id="name" type="text" autocomplete="name">
+  </label>
+  <label>บทบาท
+    <select id="role">
+      <option value="อาจารย์">อาจารย์/ผู้สอน</option>
+      <option value="TA">ผู้ช่วยสอน (TA)</option>
+    </select>
+  </label>
+  <label>ประเภทค่าตอบแทน
+    <select id="typeSelect"><option value="">กำลังโหลด...</option></select>
+  </label>
+  <label>รายวิชา
+    <input id="course" type="text" placeholder="เช่น CS361">
+  </label>
+  <label>ภาคการศึกษา
+    <select id="term">
+      <option>1/2569</option>
+      <option>2/2569</option>
+      <option>ฤดูร้อน/2569</option>
+    </select>
+  </label>
+  <label>วันที่ปฏิบัติงาน
+    <input id="date" type="date">
+  </label>
+  <label>จำนวนชั่วโมง
+    <input
+      id="hours"
+      type="number"
+      min="0.5"
+      step="0.5"
+      onkeydown="if(['e', 'E', '+', '-'].includes(event.key)) event.preventDefault();"
+    >
+  </label>
 
-      <p id="estimate" class="estimate"></p>
-
-      <div class="actions">
-        <button id="btnDraft" class="btn ghost" type="button">บันทึกร่าง</button>
-        <button id="btnSubmit" class="btn" type="button">ยื่นคำขอ</button>
-      </div>
-      <p id="formMsg" class="msg" role="status"></p>
+  <!-- UploadFile -->
+  <div class="upload-field">
+    <div class="upload-head">
+      <span class="upload-title">เอกสารประกอบ</span>
+      <small class="upload-hint">สูงสุด 5 ไฟล์ ไฟล์ละไม่เกิน 100MB (เอกสาร ภาพ วิดีโอ)</small>
     </div>
+
+    <input id="file" type="file" multiple hidden
+      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.jpeg,.png,.gif,.webp,.mp4,.mov,.webm,.avi,.mkv">
+    <button type="button" id="addBtn" class="btn-add">+ เพิ่มไฟล์</button>
+
+    <div id="error" class="upload-error"></div>
+    <ul id="fileList" class="file-list"></ul>
+  </div>
+
+  <p id="estimate" class="estimate"></p>
+  <ul id="existingFileList"></ul>
+  <div class="actions">
+    <button id="btnDraft" class="btn ghost" type="button">บันทึกร่าง</button>
+    <button id="btnSubmit" class="btn" type="button">ยื่นคำขอ</button>
+  </div>
+  <p id="formMsg" class="msg" role="status"></p>
+</div>
   </section>
 
   <!-- หมวด 6: รายการคำขอ (V2) -->
@@ -242,10 +263,12 @@
             <th>ชม.</th>
             <th>ยอด</th>
             <th>สถานะ</th>
+            <th>ไฟล์แนบ</th>
+            <th>จัดการ</th>
           </tr>
         </thead>
         <tbody id="claimRows">
-          <tr><td colspan="8">กำลังโหลดข้อมูล...</td></tr>
+          <tr><td colspan="10">กำลังโหลดข้อมูล...</td></tr>
         </tbody>
       </table>
     </div>

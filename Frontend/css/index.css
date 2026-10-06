@@ -323,6 +323,11 @@ tr:last-child td {
   color: var(--ink);
 }
 
+.form-card input[type="file"] {
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
 .form-card input:focus,
 .form-card select:focus,
 .filters select:focus,
@@ -441,3 +446,99 @@ tr:last-child td {
     padding: 18px;
   }
 }
+/*Upload*/
+.upload-field {
+  grid-column: 1 / -1;          /* กินเต็มแถว ไม่ไปแย่งช่องกับ field อื่น */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+.upload-title { font-weight: 600; }
+.upload-hint  { color: #5f6368; }
+
+.btn-add {
+  width: 100%;
+  padding: 14px;
+  border: 2px dashed #bdc1c6;
+  border-radius: 8px;
+  background: #fafafa;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-add:hover { background: #f1f3f4; }
+
+.upload-error { color: #d93025; }
+.upload-error:empty { display: none; }  /* ไม่เว้นที่ว่างตอนไม่มี error */
+
+.file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.file-list:empty { display: none; }
+
+.form-card .actions,
+.form-card .estimate,
+.form-card .msg { grid-column: 1 / -1; }
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: #fff;
+}
+.file-size { color: #5f6368; }
+
+.btn-remove {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #5f6368;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color .15s, color .15s, transform .1s;
+}
+
+
+.btn-remove:hover {
+  background: #fce8e6;
+  color: #d93025;
+}
+
+
+.btn-remove:active {
+  background: #f6c7c3;
+  color: #a50e0e;
+  transform: scale(0.9);
+}
+
+/* กด Tab มาโฟกัส (สำหรับคนใช้คีย์บอร์ด) */
+.btn-remove:focus-visible {
+  outline: 2px solid #d93025;
+  outline-offset: 2px;
+}
+/* ===== ไอคอนไฟล์ ===== */
+.file-icon {
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+      margin-right: 4px;
+      object-fit: contain;
+    }
