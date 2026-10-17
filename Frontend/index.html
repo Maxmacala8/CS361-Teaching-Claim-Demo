@@ -20,9 +20,11 @@
       <a href="#rules">เกณฑ์การนับชั่วโมง</a>
       <a href="#process">กระบวนการเบิกจ่าย</a>
       <a href="#documents">เอกสารประกอบ</a>
-      <a href="#claim">ยื่นคำขอ</a>
-      <a href="#claims">รายการคำขอ</a>
+      <a href="#claim" data-roles="Teacher TA" hidden>ยื่นคำขอ</a>
+      <a href="#claims" data-roles="Teacher TA Officer Approver Admin" hidden>รายการคำขอ</a>
+      <a href="#review" data-roles="Officer Approver" hidden>ตรวจสอบ/อนุมัติ</a>
     </nav>
+    <span id="userBox"></span>
   </div>
 </header>
 
@@ -32,31 +34,19 @@
     <p class="eyebrow">ประกาศและระเบียบที่เกี่ยวข้อง &middot; ศูนย์ลำปาง</p>
     <h1>หลักเกณฑ์และอัตราการจ่ายเงินค่าตอบแทนการสอน</h1>
     <p class="hero-lede">
-      สรุปข้อมูลตามระเบียบมหาวิทยาลัยธรรมศาสตร์ ว่าด้วยหลักเกณฑ์และอัตราการจ่ายเงินค่าตอบแทนแก่บุคลากรทางการศึกษาของศูนย์ลำปาง พ.ศ. ๒๕๕๑ และระเบียบกระทรวงการคลัง พ.ศ. ๒๕๕๑ พร้อมยื่นคำขอเบิกและติดตามรายการได้ในหน้านี้
+      สรุปข้อมูลตามระเบียบมหาวิทยาลัยธรรมศาสตร์ ว่าด้วยหลักเกณฑ์และอัตราการจ่ายเงินค่าตอบแทนแก่บุคลากรทางการศึกษาของศูนย์ลำปาง พ.ศ. ๒๕๕๑ และระเบียบกระทรวงการคลัง พ.ศ. ๒๕๕๑ เข้าสู่ระบบเพื่อยื่นคำขอ ตรวจสอบ และอนุมัติตามสิทธิ์ของแต่ละบทบาท
     </p>
   </section>
 
-  <!-- หมวด 1: ประเภทและอัตราค่าตอบแทน (โหลดจากฐานข้อมูล) -->
   <section id="rates" class="section wrap">
     <h2><span class="num">01</span>ประเภทและอัตราค่าตอบแทน</h2>
     <p class="section-lede">ข้อมูลดึงจากฐานข้อมูลกฎ จึงเพิ่มหรือปรับประเภทค่าตอบแทนได้โดยไม่ต้องแก้โค้ด</p>
-
     <div class="table-card">
       <table>
-        <thead>
-          <tr>
-            <th>ประเภท</th>
-            <th>ผู้มีสิทธิ์</th>
-            <th>เอกสารที่ต้องแนบ</th>
-            <th>อัตรา</th>
-          </tr>
-        </thead>
-        <tbody id="typeRows">
-          <tr><td colspan="4">กำลังโหลดข้อมูล...</td></tr>
-        </tbody>
+        <thead><tr><th>ประเภท</th><th>ผู้มีสิทธิ์</th><th>เอกสารที่ต้องแนบ</th><th>อัตรา</th></tr></thead>
+        <tbody id="typeRows"><tr><td colspan="4">กำลังโหลดข้อมูล...</td></tr></tbody>
       </table>
     </div>
-
     <div class="type-grid">
       <article class="type-card">
         <span class="type-tag">กระทรวงการคลัง (ระดับ ป.ตรี)</span>
@@ -76,11 +66,9 @@
     </div>
   </section>
 
-  <!-- หมวด 2: เกณฑ์การนับชั่วโมง -->
   <section id="rules" class="section wrap">
     <h2><span class="num">02</span>เกณฑ์การนับหน่วยชั่วโมงการสอน</h2>
     <p class="section-lede">เงื่อนไขและระยะเวลาในการคำนวณเงินค่าตอบแทนตามประเภทการสอน</p>
-
     <div class="type-grid">
       <article class="type-card">
         <span class="type-tag">ภาคทฤษฎี</span>
@@ -93,150 +81,116 @@
         <p>การควบคุมห้องแล็บ/ฝึกงานอย่างใกล้ชิด กำหนดให้การสอนภาคปฏิบัติ <strong>๒ ชั่วโมง คิดเป็นเงินค่าตอบแทนเท่ากับ ๑ ชั่วโมง</strong></p>
       </article>
     </div>
-
     <div class="note-box">
       <h4>ข้อกำหนดเรื่องคาบเวลา</h4>
       <p>คำว่า <strong>"๑ คาบเวลา"</strong> หมายถึง เวลาที่ปฏิบัติหน้าที่ติดต่อกัน <strong>ไม่น้อยกว่า ๓ ชั่วโมง</strong></p>
     </div>
   </section>
 
-  <!-- หมวด 3: ขั้นตอนกระบวนการ -->
   <section id="process" class="section wrap">
     <h2><span class="num">03</span>ขั้นตอนกระบวนการเบิกจ่าย</h2>
     <p class="section-lede">ภาพรวมลำดับขั้นตอนตั้งแต่เริ่มปฏิบัติงานจนถึงการเบิกจ่ายงบประมาณ</p>
-
     <ol class="process-list">
       <li>
         <span class="step-index">1</span>
         <div>
           <h3>ยื่นคำขอและหลักฐานการปฏิบัติงาน</h3>
-          <p>ผู้สอน/ผู้บรรยายพิเศษ รวบรวมข้อมูลรายวิชา ภาคการศึกษา จำนวนชั่วโมงจริง และเอกสารประกอบ</p>
+          <p>ผู้สอน/ผู้ช่วยสอน รวบรวมข้อมูลรายวิชา ภาคการศึกษา จำนวนชั่วโมงจริง และเอกสารประกอบ แล้วยื่นผ่านระบบ</p>
         </div>
       </li>
       <li>
         <span class="step-index">2</span>
         <div>
           <h3>เจ้าหน้าที่ตรวจสอบความถูกต้อง (Verification)</h3>
-          <p>ตรวจสอบสิทธิ์ตามระเบียบ ความครบถ้วนของเอกสาร การนับชั่วโมงสอน และตรวจความซ้ำซ้อนของช่วงเวลา</p>
+          <p>ตรวจสิทธิ์ตามระเบียบ ความครบถ้วนของเอกสาร การนับชั่วโมงสอน และความซ้ำซ้อน ตรวจผ่านหรือส่งกลับแก้ไขพร้อมเหตุผล</p>
         </div>
       </li>
       <li>
         <span class="step-index">3</span>
         <div>
           <h3>ผู้อนุมัติพิจารณา (Approval)</h3>
-          <p>ผู้บริหาร/ผู้อนุมัติตามลำดับขั้นพิจารณาอนุมัติคำขอเบิกจ่ายตามระเบียบข้อบังคับ</p>
+          <p>ผู้อนุมัติพิจารณาอนุมัติ ไม่อนุมัติ หรือส่งกลับ โดยไม่สามารถอนุมัติคำขอของตนเองได้</p>
         </div>
       </li>
       <li>
         <span class="step-index">4</span>
         <div>
           <h3>ดำเนินการเบิกจ่ายและบันทึกประวัติ (Disbursement)</h3>
-          <p>เบิกจ่ายจากเงินรายได้ของศูนย์ลำปาง พร้อมบันทึกประวัติข้อมูลเพื่อรองรับการตรวจสอบย้อนหลัง</p>
+          <p>เบิกจ่ายจากเงินรายได้ของศูนย์ลำปาง ทุกการดำเนินการถูกบันทึกประวัติเพื่อตรวจสอบย้อนหลัง</p>
         </div>
       </li>
     </ol>
   </section>
 
-  <!-- หมวด 4: เอกสารประกอบ -->
   <section id="documents" class="section wrap">
     <h2><span class="num">04</span>เอกสารหลักฐานที่ต้องจัดเตรียม</h2>
     <p class="section-lede">เอกสารประกอบสำคัญสำหรับการยื่นเรื่องเบิกจ่ายเงินค่าตอบแทน</p>
-
     <div class="table-card">
       <table>
         <tbody>
-          <tr>
-            <td class="bullet">●</td>
-            <td><strong>แบบฟอร์มคำขอเบิกเงินค่าตอบแทน</strong> (ระบุรายวิชา, วันที่, ช่วงเวลา และจำนวนชั่วโมง)</td>
-          </tr>
-          <tr>
-            <td class="bullet">●</td>
-            <td><strong>ตารางสอน / ตารางการปฏิบัติงาน</strong> ที่ได้รับอนุมัติจากคณะหรือหน่วยงานต้นสังกัด</td>
-          </tr>
-          <tr>
-            <td class="bullet">●</td>
-            <td><strong>บันทึกเวลาปฏิบัติงาน / ใบลงเวลาสอน</strong> (ระบุเวลาเริ่ม-สิ้นสุดชัดเจน)</td>
-          </tr>
-          <tr>
-            <td class="bullet">●</td>
-            <td><strong>หนังสือเชิญ / คำสั่งแต่งตั้ง</strong> (กรณีผู้บรรยายพิเศษ หรืออาจารย์ที่เดินทางมาปฏิบัติงาน)</td>
-          </tr>
+          <tr><td class="bullet">●</td><td><strong>แบบฟอร์มคำขอเบิกเงินค่าตอบแทน</strong> (ระบุรายวิชา, วันที่, ช่วงเวลา และจำนวนชั่วโมง)</td></tr>
+          <tr><td class="bullet">●</td><td><strong>ตารางสอน / ตารางการปฏิบัติงาน</strong> ที่ได้รับอนุมัติจากคณะหรือหน่วยงานต้นสังกัด</td></tr>
+          <tr><td class="bullet">●</td><td><strong>บันทึกเวลาปฏิบัติงาน / ใบลงเวลาสอน</strong> (ระบุเวลาเริ่ม-สิ้นสุดชัดเจน)</td></tr>
+          <tr><td class="bullet">●</td><td><strong>หนังสือเชิญ / คำสั่งแต่งตั้ง</strong> (กรณีผู้บรรยายพิเศษ หรืออาจารย์ที่เดินทางมาปฏิบัติงาน)</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <!-- หมวด 5: ฟอร์มยื่นคำขอ (V2) -->
-  <section id="claim" class="section wrap">
+  <section id="claim" class="section wrap" data-roles="Teacher TA" hidden>
     <h2><span class="num">05</span>สร้างคำขอเบิกค่าตอบแทน</h2>
-    <p class="section-lede">กรอกข้อมูล แล้วเลือกบันทึกร่างหรือยื่นคำขอ ระบบจะตรวจกฎและคำนวณยอดให้</p>
+    <p class="section-lede">กรอกข้อมูล แล้วเลือกบันทึกร่างหรือยื่นคำขอ ระบบจะตรวจกฎและคำนวณยอดให้ บทบาทของคุณถูกกำหนดจากบัญชีที่เข้าสู่ระบบ</p>
 
     <div class="form-card">
-  <label>ชื่อผู้ขอเบิก
-    <input id="name" type="text" autocomplete="name">
-  </label>
-  <label>บทบาท
-    <select id="role">
-      <option value="อาจารย์">อาจารย์/ผู้สอน</option>
-      <option value="TA">ผู้ช่วยสอน (TA)</option>
-    </select>
-  </label>
-  <label>ประเภทค่าตอบแทน
-    <select id="typeSelect"><option value="">กำลังโหลด...</option></select>
-  </label>
-  <label>รายวิชา
-    <input id="course" type="text" placeholder="เช่น CS361">
-  </label>
-  <label>ภาคการศึกษา
-    <select id="term">
-      <option>1/2569</option>
-      <option>2/2569</option>
-      <option>ฤดูร้อน/2569</option>
-    </select>
-  </label>
-  <label>วันที่ปฏิบัติงาน
-    <input id="date" type="date">
-  </label>
-  <label>จำนวนชั่วโมง
-    <input
-      id="hours"
-      type="number"
-      min="0.5"
-      step="0.5"
-      onkeydown="if(['e', 'E', '+', '-'].includes(event.key)) event.preventDefault();"
-    >
-  </label>
+      <label>ชื่อผู้ขอเบิก
+        <input id="name" type="text" autocomplete="name">
+      </label>
+      <label>ประเภทค่าตอบแทน
+        <select id="typeSelect"><option value="">กำลังโหลด...</option></select>
+      </label>
+      <label>รายวิชา
+        <input id="course" type="text" placeholder="เช่น CS361">
+      </label>
+      <label>ภาคการศึกษา
+        <select id="term">
+          <option>1/2569</option>
+          <option>2/2569</option>
+          <option>ฤดูร้อน/2569</option>
+        </select>
+      </label>
+      <label>วันที่ปฏิบัติงาน
+        <input id="date" type="date">
+      </label>
+      <label>จำนวนชั่วโมง
+        <input id="hours" type="number" min="0.5" step="0.5">
+      </label>
 
-  <!-- UploadFile -->
-  <div class="upload-field">
-    <div class="upload-head">
-      <span class="upload-title">เอกสารประกอบ</span>
-      <small class="upload-hint">สูงสุด 5 ไฟล์ ไฟล์ละไม่เกิน 100MB (เอกสาร ภาพ วิดีโอ)</small>
+      <div class="upload-field">
+        <div class="upload-head">
+          <span class="upload-title">เอกสารประกอบ</span>
+          <small class="upload-hint">สูงสุด 5 ไฟล์ ไฟล์ละไม่เกิน 100MB (เอกสาร ภาพ วิดีโอ)</small>
+        </div>
+        <input id="file" type="file" multiple hidden
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.jpeg,.png,.gif,.webp,.mp4,.mov,.webm,.avi,.mkv">
+        <button type="button" id="addBtn" class="btn-add">+ เพิ่มไฟล์</button>
+        <div id="error" class="upload-error"></div>
+        <ul id="fileList" class="file-list"></ul>
+      </div>
+
+      <p id="estimate" class="estimate"></p>
+      <ul id="existingFileList" class="file-list"></ul>
+      <div class="actions">
+        <button id="btnDraft" class="btn ghost" type="button">บันทึกร่าง</button>
+        <button id="btnSubmit" class="btn" type="button">ยื่นคำขอ</button>
+        <button id="btnCancel" class="btn ghost" type="button" hidden>ยกเลิกการแก้ไข</button>
+      </div>
+      <p id="formMsg" class="msg" role="status"></p>
     </div>
-
-    <input id="file" type="file" multiple hidden
-      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.jpeg,.png,.gif,.webp,.mp4,.mov,.webm,.avi,.mkv">
-    <button type="button" id="addBtn" class="btn-add">+ เพิ่มไฟล์</button>
-
-    <div id="error" class="upload-error"></div>
-    <ul id="fileList" class="file-list"></ul>
-  </div>
-
-  <p id="estimate" class="estimate"></p>
-  <ul id="existingFileList"></ul>
-  <div class="actions">
-    <button id="btnDraft" class="btn ghost" type="button">บันทึกร่าง</button>
-    <button id="btnSubmit" class="btn" type="button">ยื่นคำขอ</button>
-  </div>
-  <p id="formMsg" class="msg" role="status"></p>
-</div>
   </section>
 
-  <!-- หมวด 6: รายการคำขอ (V2) -->
-  <section id="claims" class="section wrap">
+  <section id="claims" class="section wrap" data-roles="Teacher TA Officer Approver Admin" hidden>
     <h2><span class="num">06</span>รายการคำขอ</h2>
-    <p class="section-lede">ค้นหาและกรองคำขอตามภาคการศึกษาและสถานะ</p>
-
+    <p class="section-lede">ผู้ขอเห็นเฉพาะคำขอของตนเอง เจ้าหน้าที่และผู้อนุมัติเห็นคำขอที่ยื่นแล้วทั้งหมด</p>
     <div class="filters">
       <select id="fTerm" aria-label="กรองตามภาคการศึกษา">
         <option value="">ทุกภาคการศึกษา</option>
@@ -248,33 +202,45 @@
         <option value="">ทุกสถานะ</option>
         <option value="DRAFT">ร่าง</option>
         <option value="SUBMITTED">ยื่นแล้ว</option>
+        <option value="VERIFIED">ตรวจแล้ว</option>
+        <option value="APPROVED">อนุมัติ</option>
+        <option value="REJECTED">ไม่อนุมัติ</option>
+        <option value="RETURNED">ส่งกลับแก้ไข</option>
       </select>
     </div>
-
     <div class="table-card">
       <table>
         <thead>
           <tr>
-            <th>รหัส</th>
-            <th>ผู้ขอ</th>
-            <th>ประเภท</th>
-            <th>วิชา</th>
-            <th>ภาค</th>
-            <th>ชม.</th>
-            <th>ยอด</th>
-            <th>สถานะ</th>
-            <th>ไฟล์แนบ</th>
-            <th>จัดการ</th>
+            <th>รหัส</th><th>ผู้ขอ</th><th>ประเภท</th><th>วิชา</th><th>ภาค</th>
+            <th>ชม.</th><th>ยอด</th><th>สถานะ</th><th>ไฟล์แนบ</th><th>จัดการ</th>
           </tr>
         </thead>
-        <tbody id="claimRows">
-          <tr><td colspan="10">กำลังโหลดข้อมูล...</td></tr>
-        </tbody>
+        <tbody id="claimRows"><tr><td colspan="10">กำลังโหลดข้อมูล...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="review" class="section wrap" data-roles="Officer Approver" hidden>
+    <h2><span class="num">07</span>คำขอรอตรวจสอบ/อนุมัติ</h2>
+    <p class="section-lede">เจ้าหน้าที่เห็นคำขอที่ยื่นแล้ว ผู้อนุมัติเห็นคำขอที่ตรวจผ่านแล้ว การส่งกลับหรือไม่อนุมัติต้องระบุเหตุผล</p>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr><th>รหัส</th><th>ผู้ขอ</th><th>ประเภท</th><th>วิชา</th><th>ชม.</th><th>ยอด</th><th>ดำเนินการ</th></tr>
+        </thead>
+        <tbody id="reviewRows"><tr><td colspan="7">กำลังโหลดข้อมูล...</td></tr></tbody>
       </table>
     </div>
   </section>
 
 </main>
+
+<dialog id="histDlg">
+  <h3>ประวัติการดำเนินการ</h3>
+  <ul id="histBody"></ul>
+  <button class="btn small" type="button" onclick="document.getElementById('histDlg').close()">ปิด</button>
+</dialog>
 
 <footer class="site-footer">
   <div class="wrap">
@@ -282,6 +248,8 @@
   </div>
 </footer>
 
+<script src="js/auth.js"></script>
 <script src="js/app.js"></script>
+<script src="js/review.js"></script>
 </body>
 </html>
