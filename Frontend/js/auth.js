@@ -1,8 +1,8 @@
 // ตั้งค่าจาก Cognito (User Pool > App integration)
 const AUTH = {
-  domain: "https://YOUR-PREFIX.auth.us-east-1.amazoncognito.com",
-  clientId: "YOUR_APP_CLIENT_ID",
-  redirect: location.origin + location.pathname, // ต้องตรงกับ Callback URL ใน App client (ต้องเป็น HTTPS)
+  domain: "https://cs361-claim-g13.auth.us-east-1.amazoncognito.com",
+  clientId: "5qljmkmpa1o4kb0sl1c1u129fa",
+  redirect: location.origin + location.pathname, // ต้องตรงกับ Callback URL ใน App client (localhost ใช้ HTTP ได้)
 };
 
 const b64url = (buf) =>
@@ -14,7 +14,7 @@ async function login() {
   sessionStorage.setItem("pkce", verifier);
   location.href =
     `${AUTH.domain}/oauth2/authorize?response_type=code&client_id=${AUTH.clientId}` +
-    `&redirect_uri=${encodeURIComponent(AUTH.redirect)}&scope=openid+email&code_challenge_method=S256&code_challenge=${challenge}`;
+    `&redirect_uri=${encodeURIComponent(AUTH.redirect)}&scope=openid+email+profile&code_challenge_method=S256&code_challenge=${challenge}`;
 }
 
 function logout() {
@@ -65,9 +65,10 @@ function applyRoles() {
     : `<button class="btn small" onclick="login()">เข้าสู่ระบบ</button>`;
 }
 
-(async () => {
+// รอให้ app.js / review.js โหลดครบก่อน แล้วค่อยส่งสัญญาณ auth-ready
+window.addEventListener("load", async () => {
   await handleCallback();
   ME = currentUser();
   applyRoles();
   document.dispatchEvent(new Event("auth-ready"));
-})();
+});

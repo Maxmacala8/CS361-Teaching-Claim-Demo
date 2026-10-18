@@ -1,177 +1,110 @@
-// Lambda (Node.js 20) สำหรับ CS361 Teaching Claim V2
-// Routes (API Gateway HTTP API, payload v2):
-//   GET  /types   -> อ่านประเภทค่าตอบแทนจาก DynamoDB
-//   GET  /claims  -> รายการคำขอ (กรอง ?term= & ?status= ได้)
-//   POST /claims  -> บันทึกร่าง / ยื่นคำขอ พร้อมตรวจกฎ
-//   OPTIONS /{proxy+} -> preflight (CORS ตั้งที่ API Gateway)
-//
-// หมายเหตุ: ไม่ใส่ header CORS ในโค้ดนี้ ให้ตั้งที่ API Gateway ที่เดียว
-// เพื่อไม่ให้ header ซ้ำกัน
-
+// ฟังก์ชันที่ต้องเพิ่ม/แทรกเข้า Lambda เดิมของ V2 (ตาราง ClaimHistory: PK claimId, SK at)
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import {
-  DynamoDBDocumentClient,
-  ScanCommand,
-  QueryCommand,
-  GetCommand,
-  PutCommand,
-} from "@aws-sdk/lib-dynamodb";
-import { randomUUID } from "node:crypto";
+import { DynamoDBDocumentClient, GetCommand, QueryCommand, TransactWriteCommand } from "@aws-sdk/lib-dynamodb";
 
 const db = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+const CLAIMS = process.env.CLAIMS_TABLE || "Claims";
+const HISTORY = process.env.HISTORY_TABLE || "ClaimHistory";
+const reply = (code, body) => ({ statusCode: code, headers: { "Content-Type": "application/json" /* + cors เดิม */ }, body: JSON.stringify(body) });
 
-const TYPES_TABLE = process.env.TYPES_TABLE || "CompensationTypes";
-const CLAIMS_TABLE = process.env.CLAIMS_TABLE || "Claims";
-const TERM_INDEX = "term-index";
-
-const TERMS = ["1/2569", "2/2569", "ฤดูร้อน/2569"];
-const STATUSES = ["DRAFT", "SUBMITTED"];
-const ROLES = ["อาจารย์", "TA"];
-const DEFAULT_MAX_HOURS = 8; // ใช้เมื่อประเภทนั้นไม่ได้กำหนด maxHoursPerDay
-
-class HttpError extends Error {
-  constructor(statusCode, message) {
-    super(message);
-    this.statusCode = statusCode;
-  }
+// ---------- 1) ตัวตนมาจาก token ที่ API Gateway ตรวจแล้วเท่านั้น (ไม่อ่านจาก body) ----------
+export function getUser(event) {
+  const c = event.requestContext?.authorizer?.jwt?.claims;
+  if (!c) return null;
+  let g = c["cognito:groups"] || [];
+  // HTTP API ส่งกลุ่มมาเป็นสตริงเช่น "[Teacher Officer]" ต้องแปลงเอง
+  if (typeof g === "string") g = g.replace(/[\[\]]/g, "").split(/[\s,]+/).filter(Boolean);
+  return { sub: c.sub, name: c.email || c["cognito:username"], groups: g };
 }
+export const has = (u, ...gs) => gs.some((g) => u.groups.includes(g));
+const STAFF = ["Officer", "Approver", "Admin"];
 
-const json = (statusCode, body) => ({
-  statusCode,
-  headers: { "Content-Type": "application/json; charset=utf-8" },
-  body: JSON.stringify(body),
-});
+// ---------- 2) กันดูข้อมูลคนอื่น (BOLA): เจ้าของ หรือเจ้าหน้าที่ (เห็นเฉพาะที่ไม่ใช่ร่าง) ----------
+export const canView = (u, claim) =>
+  claim.ownerSub === u.sub || (has(u, ...STAFF) && claim.status !== "DRAFT");
 
-// ---------- GET /types ----------
-async function listTypes() {
-  const out = await db.send(new ScanCommand({ TableName: TYPES_TABLE }));
-  return (out.Items || []).sort((a, b) => a.typeId.localeCompare(b.typeId));
+export const filterVisible = (u, claims) => claims.filter((c) => canView(u, c));
+
+// ใช้ใน createClaim / deleteClaim เดิม: แก้/ลบได้เฉพาะเจ้าของ และสถานะ DRAFT หรือ RETURNED
+export function assertCanEdit(u, claim) {
+  if (claim.ownerSub !== u.sub) return reply(404, { message: "ไม่พบคำขอ" });
+  if (!["DRAFT", "RETURNED"].includes(claim.status)) return reply(409, { message: "สถานะนี้แก้ไขไม่ได้" });
+  return null;
 }
+// ใน createClaim: ownerSub = u.sub, claimantName = u.name, role = has(u,"TA") ? "TA" : "อาจารย์"
+// และอนุญาตเฉพาะ has(u,"Teacher","TA") ส่วน role ที่ส่งมาใน body ให้เมินทิ้ง
 
-// ---------- GET /claims ----------
-async function listClaims(qs = {}) {
-  const { term, status } = qs;
-  let items;
-
-  if (term) {
-    // ใช้ GSI: term-index (PK = term)
-    const out = await db.send(
-      new QueryCommand({
-        TableName: CLAIMS_TABLE,
-        IndexName: TERM_INDEX,
-        KeyConditionExpression: "#t = :t",
-        ExpressionAttributeNames: { "#t": "term" },
-        ExpressionAttributeValues: { ":t": term },
-      })
-    );
-    items = out.Items || [];
-  } else {
-    const out = await db.send(new ScanCommand({ TableName: CLAIMS_TABLE }));
-    items = out.Items || [];
-  }
-
-  if (status) items = items.filter((c) => c.status === status);
-  return items.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
-}
-
-// ---------- POST /claims ----------
-function parseBody(event) {
-  try {
-    return JSON.parse(event.body || "{}");
-  } catch {
-    throw new HttpError(400, "รูปแบบข้อมูลไม่ถูกต้อง");
-  }
-}
-
-function validateInput(b) {
-  if (!STATUSES.includes(b.status)) throw new HttpError(400, "สถานะไม่ถูกต้อง");
-  if (!b.claimantName || !String(b.claimantName).trim())
-    throw new HttpError(400, "กรุณากรอกชื่อผู้ขอเบิก");
-  if (!ROLES.includes(b.role)) throw new HttpError(400, "บทบาทไม่ถูกต้อง");
-  if (!b.typeId) throw new HttpError(400, "กรุณาเลือกประเภทค่าตอบแทน");
-  if (!b.course || !String(b.course).trim()) throw new HttpError(400, "กรุณากรอกรายวิชา");
-  if (!TERMS.includes(b.term)) throw new HttpError(400, "ภาคการศึกษาไม่ถูกต้อง");
-
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(b.date || "") || Number.isNaN(Date.parse(b.date)))
-    throw new HttpError(400, "กรุณาระบุวันที่ปฏิบัติงานให้ถูกต้อง");
-
-  const h = Number(b.hours);
-  if (!Number.isFinite(h) || h <= 0) throw new HttpError(400, "จำนวนชั่วโมงต้องมากกว่า 0");
-  if ((h * 2) % 1 !== 0) throw new HttpError(400, "จำนวนชั่วโมงต้องเป็นทวีคูณของ 0.5");
-}
-
-async function createClaim(event) {
-  const b = parseBody(event);
-  validateInput(b);
-
-  // 1) ประเภทค่าตอบแทนต้องมีอยู่จริง (กฎอยู่ใน DB ไม่ได้ฝังในโค้ด)
-  const t = (
-    await db.send(new GetCommand({ TableName: TYPES_TABLE, Key: { typeId: b.typeId } }))
-  ).Item;
-  if (!t) throw new HttpError(400, "ไม่พบประเภทค่าตอบแทนที่เลือก");
-
-  // 2) บทบาทต้องมีสิทธิ์
-  if (!(t.roles || []).includes(b.role))
-    throw new HttpError(400, `บทบาท "${b.role}" ไม่มีสิทธิ์เบิกประเภท "${t.name}"`);
-
-  // 3) ชั่วโมงต้องไม่เกินเพดานต่อวัน
-  const hours = Number(b.hours);
-  const maxHours = Number(t.maxHoursPerDay || DEFAULT_MAX_HOURS);
-  if (hours > maxHours)
-    throw new HttpError(400, `ชั่วโมงเกินเกณฑ์ ประเภทนี้เบิกได้ไม่เกิน ${maxHours} ชั่วโมงต่อวัน`);
-
-  // 4) ตรวจคำขอซ้ำ (เฉพาะตอน "ยื่น")
-  //    ซ้ำ = ผู้ขอ + ประเภท + วิชา + ภาค + วันที่ เหมือนกัน และเคยยื่นแล้ว
-  const name = String(b.claimantName).trim();
-  const course = String(b.course).trim();
-
-  if (b.status === "SUBMITTED") {
-    const existing = await listClaims({ term: b.term, status: "SUBMITTED" });
-    const dup = existing.find(
-      (c) =>
-        c.claimantName === name &&
-        c.typeId === b.typeId &&
-        c.course === course &&
-        c.date === b.date
-    );
-    if (dup) throw new HttpError(409, "คำขอซ้ำ: เคยยื่นรายการนี้แล้ว (ผู้ขอ/ประเภท/วิชา/วันที่ตรงกัน)");
-  }
-
-  // 5) คำนวณยอดที่ฝั่งเซิร์ฟเวอร์ (ไม่เชื่อค่าจากหน้าเว็บ)
-  const amount = Number(t.rate) * hours;
-
-  const claim = {
-    claimId: randomUUID(),
-    status: b.status,
-    claimantName: name,
-    role: b.role,
-    typeId: t.typeId,
-    typeName: t.name,
-    rate: Number(t.rate),
-    course,
-    term: b.term,
-    date: b.date,
-    hours,
-    amount,
-    createdAt: new Date().toISOString(),
-  };
-
-  await db.send(new PutCommand({ TableName: CLAIMS_TABLE, Item: claim }));
-  return claim;
-}
-
-// ---------- entry ----------
-export const handler = async (event) => {
-  const route = event.routeKey || "";
-  try {
-    if (route.startsWith("OPTIONS")) return { statusCode: 204 };
-    if (route === "GET /types") return json(200, await listTypes());
-    if (route === "GET /claims") return json(200, await listClaims(event.queryStringParameters || {}));
-    if (route === "POST /claims") return json(201, await createClaim(event));
-    return json(404, { message: "ไม่พบเส้นทางนี้" });
-  } catch (e) {
-    if (e instanceof HttpError) return json(e.statusCode, { message: e.message });
-    console.error("UNEXPECTED", e); // ไปดูได้ใน CloudWatch Logs
-    return json(500, { message: "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์" });
-  }
+// ---------- 3) Workflow: ตารางที่อนุญาตให้เปลี่ยนสถานะ ----------
+const FLOW = {
+  SUBMITTED: {
+    VERIFY: { to: "VERIFIED", group: "Officer" },
+    RETURN: { to: "RETURNED", group: "Officer" },
+  },
+  VERIFIED: {
+    APPROVE: { to: "APPROVED", group: "Approver" },
+    REJECT: { to: "REJECTED", group: "Approver" },
+    RETURN: { to: "RETURNED", group: "Approver" },
+  },
 };
+
+export async function claimAction(user, claimId, body) {
+  const { Item: claim } = await db.send(new GetCommand({ TableName: CLAIMS, Key: { claimId } }));
+  if (!claim || !canView(user, claim)) return reply(404, { message: "ไม่พบคำขอ" });
+
+  const rule = FLOW[claim.status]?.[body.action];
+  if (!rule) return reply(409, { message: `สถานะ ${claim.status} ไม่สามารถ ${body.action} ได้` });
+  if (!has(user, rule.group)) return reply(403, { message: "ไม่มีสิทธิ์ทำรายการนี้" });
+  if (claim.ownerSub === user.sub) return reply(403, { message: "ห้ามตรวจ/อนุมัติคำขอของตนเอง" });
+  if (["RETURN", "REJECT"].includes(body.action) && !body.comment?.trim())
+    return reply(400, { message: "กรุณาระบุเหตุผล" });
+
+  const at = new Date().toISOString();
+  try {
+    await db.send(new TransactWriteCommand({ TransactItems: [
+      { Update: { // เงื่อนไข #s = :from กันสองคนกดพร้อมกัน
+        TableName: CLAIMS, Key: { claimId },
+        UpdateExpression: "SET #s = :to, updatedAt = :at",
+        ConditionExpression: "#s = :from",
+        ExpressionAttributeNames: { "#s": "status" },
+        ExpressionAttributeValues: { ":to": rule.to, ":from": claim.status, ":at": at },
+      } },
+      { Put: { TableName: HISTORY, Item: {
+        claimId, at, actorSub: user.sub, actorName: user.name,
+        action: body.action, from: claim.status, to: rule.to, comment: body.comment?.trim() || "",
+      } } },
+    ] }));
+  } catch (e) {
+    if (e.name === "TransactionCanceledException") return reply(409, { message: "สถานะเปลี่ยนไปแล้ว กรุณารีเฟรช" });
+    throw e;
+  }
+  return reply(200, { claimId, status: rule.to });
+}
+
+// บันทึกประวัติสำหรับ SUBMIT/สร้าง/แก้ไข ที่ createClaim เดิมเรียกหลัง PutCommand
+export const writeHistory = (item) =>
+  db.send(new TransactWriteCommand({ TransactItems: [{ Put: { TableName: HISTORY, Item: item } }] }));
+
+export async function getHistory(user, claimId) {
+  const { Item: claim } = await db.send(new GetCommand({ TableName: CLAIMS, Key: { claimId } }));
+  if (!claim || !canView(user, claim)) return reply(404, { message: "ไม่พบคำขอ" });
+  const { Items } = await db.send(new QueryCommand({
+    TableName: HISTORY, KeyConditionExpression: "claimId = :c", ExpressionAttributeValues: { ":c": claimId } }));
+  return reply(200, Items);
+}
+
+// download: ต้องส่ง claimId มาด้วย แล้วตรวจว่า fileKey อยู่ในคำขอนั้น และผู้ขอดูได้
+export async function assertCanDownload(user, claimId, fileKey) {
+  const { Item: claim } = await db.send(new GetCommand({ TableName: CLAIMS, Key: { claimId } }));
+  if (!claim || !canView(user, claim) || !(claim.attachments || []).includes(fileKey))
+    return reply(404, { message: "ไม่พบไฟล์" });
+  return null;
+}
+
+// ---------- 4) ส่วนที่แก้ใน handler ----------
+// const user = getUser(event);
+// if (path !== "/types" && !user) return reply(401, { message: "ต้องเข้าสู่ระบบ" });
+// const m = path.match(/^\/claims\/([^/]+)\/(action|history)$/);
+// if (m && m[2] === "action"  && method === "POST") return claimAction(user, m[1], JSON.parse(event.body || "{}"));
+// if (m && m[2] === "history" && method === "GET")  return getHistory(user, m[1]);
+// GET /claims → listClaims(...) แล้วตามด้วย filterVisible(user, items)
+// POST /get-upload-url → ให้เฉพาะ has(user,"Teacher","TA") และตั้ง key เป็น `uploads/${user.sub}/${uuid}-${fileName}`
