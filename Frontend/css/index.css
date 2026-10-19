@@ -60,26 +60,39 @@ h1, h2, h3, h4 {
 .header-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 64px;
+  gap: 24px;
+  min-height: 64px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .mark {
+  flex: none;
+  white-space: nowrap;
   font-family: var(--serif);
   font-weight: 600;
   font-size: 17px;
 }
 
 .nav {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  gap: 24px;
+  gap: 20px;
   font-size: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
 }
 
 .nav a {
+  white-space: nowrap;
   color: #e7e2d2;
   text-decoration: none;
-  padding-bottom: 4px;
+  padding: 4px 0;
   border-bottom: 2px solid transparent;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
@@ -87,6 +100,41 @@ h1, h2, h3, h4 {
 .nav a:hover {
   color: #ffffff;
   border-bottom-color: var(--brass);
+}
+
+/* ===== กล่องผู้ใช้ ===== */
+#userBox {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.3;
+  max-width: 220px;
+}
+
+.user-email {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.user-role {
+  margin-top: 2px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--brass-soft);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--brass);
 }
 
 /* ===== Hero ===== */
@@ -377,6 +425,28 @@ tr:last-child td {
   background: rgba(31, 58, 62, 0.06);
 }
 
+/* ปุ่มขนาดเล็ก (เดิมไม่มี) */
+.btn.small {
+  padding: 6px 14px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* ปุ่มใน header (พื้นหลังเข้ม) */
+.site-header .btn.ghost {
+  color: #f1efe4;
+  border-color: rgba(241, 239, 228, 0.5);
+}
+
+.site-header .btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.site-header .btn:not(.ghost) {
+  background: var(--brass);
+  border-color: var(--brass);
+}
+
 .msg {
   grid-column: 1 / -1;
   margin: 0;
@@ -428,24 +498,6 @@ tr:last-child td {
   color: var(--ink-soft);
 }
 
-/* ===== มือถือ ===== */
-@media (max-width: 600px) {
-  .nav {
-    display: none;
-  }
-
-  .hero {
-    padding: 48px 24px 32px;
-  }
-
-  .section {
-    padding: 32px 24px;
-  }
-
-  .form-card {
-    padding: 18px;
-  }
-}
 /*Upload*/
 .upload-field {
   grid-column: 1 / -1;          /* กินเต็มแถว ไม่ไปแย่งช่องกับ field อื่น */
@@ -516,12 +568,10 @@ tr:last-child td {
   transition: background-color .15s, color .15s, transform .1s;
 }
 
-
 .btn-remove:hover {
   background: #fce8e6;
   color: #d93025;
 }
-
 
 .btn-remove:active {
   background: #f6c7c3;
@@ -534,11 +584,57 @@ tr:last-child td {
   outline: 2px solid #d93025;
   outline-offset: 2px;
 }
+
 /* ===== ไอคอนไฟล์ ===== */
 .file-icon {
-      width: 16px;
-      height: 16px;
-      vertical-align: middle;
-      margin-right: 4px;
-      object-fit: contain;
-    }
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 4px;
+  object-fit: contain;
+}
+
+/* ===== Responsive (ต้องอยู่ท้ายไฟล์ เพื่อทับกฎด้านบน) ===== */
+
+/* จอแคบ/กลาง: เมนูลงมาเป็นแถวที่ 2 เลื่อนซ้าย-ขวาได้ */
+@media (max-width: 1100px) {
+  .header-inner {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .mark {
+    order: 1;
+    flex: 1;
+  }
+
+  #userBox {
+    order: 2;
+  }
+
+  .nav {
+    order: 3;
+    flex: 0 0 100%;
+    padding-bottom: 6px;
+    gap: 18px;
+  }
+}
+
+/* มือถือ */
+@media (max-width: 600px) {
+  .user-chip {
+    display: none; /* มือถือเหลือแค่ปุ่มออกจากระบบ */
+  }
+
+  .hero {
+    padding: 48px 24px 32px;
+  }
+
+  .section {
+    padding: 32px 24px;
+  }
+
+  .form-card {
+    padding: 18px;
+  }
+}
