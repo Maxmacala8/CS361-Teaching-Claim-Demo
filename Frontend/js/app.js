@@ -70,8 +70,20 @@ async function uploadToS3(file, status) {
 async function submitClaim(status) {
   const msg = $("formMsg");
   msg.className = "msg";
-  msg.textContent = "กำลังตรวจสอบเงื่อนไข...";
+  msg.textContent = "กำลังอัปโหลดเอกสารประกอบ..."; // เปลี่ยนข้อความให้สอดคล้อง
+  
   try {
+    const uploaded = [];
+    
+    // 1) อัปโหลดไฟล์ใหม่ขึ้น S3 ก่อน ถ้ามีไฟล์ที่ต้องอัป
+    if (files.length > 0) {
+      for (const f of files) {
+        uploaded.push(await uploadToS3(f, status));
+      }
+    }
+
+    // 2) จัดเตรียมข้อมูลทั้งหมด พร้อมแนบ key ของไฟล์ส่งไปให้ Lambda บันทึกรอบเดียว
+    msg.textContent = "กำลังบันทึกข้อมูล...";
     const body = {
       claimId: currentEditClaimId,
       status,
@@ -81,24 +93,17 @@ async function submitClaim(status) {
       term: $("term").value,
       date: $("date").value,
       hours: Number($("hours").value),
+      attachments: [...existingAttachments, ...uploaded] // รวมไฟล์เก่าและใหม่
     };
 
-    await api("/claims", { method: "POST", body: JSON.stringify({ ...body, dryRun: true }) });
-
-    const uploaded = [];
-    if (files.length) {
-      msg.textContent = "ข้อมูลถูกต้อง กำลังอัปโหลดไฟล์แนบ...";
-      for (const f of files) uploaded.push(await uploadToS3(f, status));
-    }
-
-    msg.textContent = "กำลังบันทึกข้อมูล...";
-    body.attachments = [...existingAttachments, ...uploaded];
+    // ส่ง POST request เพื่อบันทึกจริง ไม่ส่ง dryRun แล้ว
     const claim = await api("/claims", { method: "POST", body: JSON.stringify(body) });
 
     msg.textContent = `บันทึกแล้ว (รหัส ${claim.claimId.slice(0, 8)}) ยอด ${baht(claim.amount)}`;
     msg.classList.add("ok");
     resetForm(false);
     loadClaims();
+    
   } catch (e) {
     msg.textContent = e.message;
     msg.classList.add("err");
