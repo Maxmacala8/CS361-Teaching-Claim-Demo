@@ -19,7 +19,8 @@ async function login() {
 
 function logout() {
   sessionStorage.clear();
-  location.href = `${AUTH.domain}/logout?client_id=${AUTH.clientId}&logout_uri=${encodeURIComponent(AUTH.redirect)}`;
+  //location.href = `${AUTH.domain}/logout?client_id=${AUTH.clientId}&logout_uri=${encodeURIComponent(AUTH.redirect)}`;
+  location.href = AUTH.redirect;
 }
 
 async function handleCallback() {
