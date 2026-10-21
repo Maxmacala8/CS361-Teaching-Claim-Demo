@@ -163,12 +163,19 @@ function claimRow(c) {
 
   const mine = ME && c.ownerSub === ME.sub;
   const editable = mine && ["DRAFT", "RETURNED"].includes(c.status);
+  // เช็กว่าเป็น Administrator หรือไม่ (ดึงฟังก์ชัน hasRole มาจาก auth.js)
+  const isAdmin = typeof hasRole === 'function' ? hasRole("Administrators") : false;
+  // แสดงปุ่มโอนเงินเมื่อเป็น Admin และสถานะคือ APPROVED
+  const canPay = isAdmin && c.status === "APPROVED"; 
+
   const actions =
     (editable
       ? `<button class="icon-btn" data-act="edit" data-id="${c.claimId}" title="แก้ไข">✏️</button>
          <button class="icon-btn" data-act="delete" data-id="${c.claimId}" title="ลบ">🗑️</button>` : "") +
     (c.status !== "DRAFT"
-      ? `<button class="btn small ghost" data-act="history" data-id="${c.claimId}">ประวัติ</button>` : "");
+      ? `<button class="btn small ghost" data-act="history" data-id="${c.claimId}">ประวัติ</button>` : "") +
+    (canPay
+      ? `<button class="btn small" data-act="pay" data-id="${c.claimId}" style="background-color: #2e7d32; color: white;">โอนเงิน</button>` : "");
 
   return `<tr>
     <td>${c.claimId.slice(0, 8)}</td><td>${escapeHtml(c.claimantName)}</td><td>${escapeHtml(c.typeName)}</td>
@@ -187,6 +194,7 @@ $("claimRows").addEventListener("click", (e) => {
   else if (act === "edit") editClaim(id);
   else if (act === "delete") deleteClaim(id);
   else if (act === "history") showHistory(id);
+  else if (act === "pay") openPaymentModal(id);
 });
 
 // ---------- เปิดไฟล์ (Lambda ตรวจสิทธิ์จาก claimId + fileKey) ----------
@@ -287,6 +295,82 @@ function renderExistingFiles() {
     )));
 }
 
+let currentPayClaimId = null;
+
+// เปิด Modal พร้อมแสดงข้อมูลบัญชี
+function openPaymentModal(claimId) {
+  const c = globalClaims.find((x) => x.claimId === claimId);
+  if (!c) return;
+  
+  currentPayClaimId = claimId;
+  
+  // สมมติว่าใน API ได้ Join ข้อมูลบัญชีแนบมาใน Object ชื่อ bankInfo แล้ว
+  const bankHtml = c.bankInfo 
+    ? `<p><strong>ธนาคาร:</strong> ${escapeHtml(c.bankInfo.bankCode)}</p>
+       <p><strong>เลขบัญชี:</strong> ${escapeHtml(c.bankInfo.accountNumber)}</p>
+       <p><strong>ชื่อบัญชี:</strong> ${escapeHtml(c.bankInfo.accountName)}</p>`
+    : `<p style="color: red;"><strong>ยังไม่พบข้อมูลบัญชีของเบิกผู้เบิก!</strong></p>`;
+
+  $("paymentBankInfo").innerHTML = `
+    <p><strong>ชื่อผู้ขอเบิก:</strong> ${escapeHtml(c.claimantName)}</p>
+    <p><strong>ยอดเงินที่ต้องโอน:</strong> <span class="rate">${baht(c.amount)}</span></p>
+    <hr style="margin: 10px 0;">
+    ${bankHtml}
+  `;
+
+  // เคลียร์ค่าเก่าในฟอร์ม
+  $("slipFile").value = "";
+  $("paymentMsg").textContent = "";
+  $("paymentMsg").className = "msg";
+  $("btnConfirmPayment").disabled = false;
+
+  document.getElementById('paymentDlg').showModal();
+}
+
+// เมื่อกดยืนยันการโอนเงิน
+$("btnConfirmPayment").addEventListener("click", async () => {
+  const fileInput = $("slipFile");
+  if (!fileInput.files || fileInput.files.length === 0) {
+    $("paymentMsg").textContent = "กรุณาแนบไฟล์สลิปหลักฐานการโอนเงิน";
+    $("paymentMsg").className = "msg err";
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const msg = $("paymentMsg");
+  
+  msg.textContent = "กำลังอัปโหลดสลิปไปยัง S3...";
+  msg.className = "msg";
+  $("btnConfirmPayment").disabled = true;
+
+  try {
+    // 1. เรียกใช้ฟังก์ชันเดิมเพื่ออัปโหลดไฟล์ขึ้น S3 (อาจจะตั้ง status เป็น PAID เพื่อให้แยกโฟลเดอร์ใน S3 ง่ายๆ)
+    const slipS3Key = await uploadToS3(file, "PAID");
+
+    msg.textContent = "อัปโหลดสำเร็จ กำลังอัปเดตสถานะการเบิกจ่าย...";
+
+    // 2. เรียก API (Lambda) เพื่อเปลี่ยนสถานะคำขอเป็น PAID พร้อมส่ง Key ของสลิปไปเก็บใน DB
+    await api("/claims/pay", {
+      method: "POST", // หรือ PUT ตามที่คุณออกแบบ API ไว้
+      body: JSON.stringify({
+        claimId: currentPayClaimId,
+        paymentSlipKey: slipS3Key,
+        status: "PAID"
+      })
+    });
+
+    document.getElementById('paymentDlg').close();
+    
+    // โหลดข้อมูลตารางใหม่เพื่อดูสถานะล่าสุด
+    loadClaims();
+    alert("บันทึกการโอนเงินและอัปเดตสถานะสำเร็จ!");
+
+  } catch (e) {
+    msg.textContent = "เกิดข้อผิดพลาด: " + e.message;
+    msg.className = "msg err";
+    $("btnConfirmPayment").disabled = false;
+  }
+});
 // ---------- อีเวนต์ ----------
 $("hours").addEventListener("keydown", (e) => { if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault(); });
 $("hours").addEventListener("input", preview);

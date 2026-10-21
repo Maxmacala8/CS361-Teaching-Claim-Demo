@@ -243,6 +243,35 @@
   <button class="btn small" type="button" onclick="document.getElementById('histDlg').close()">ปิด</button>
 </dialog>
 
+<dialog id="paymentDlg" class="modal-dialog">
+  <h3>บันทึกหลักฐานการโอนเงิน</h3>
+  
+  <div id="paymentBankInfo" class="bank-info-box">
+    <!-- ข้อมูลบัญชีธนาคารจะถูกนำมาแสดงตรงนี้ผ่าน JS -->
+  </div>
+
+  <div class="form-card" style="margin-top: 1rem;">
+    <label>หลักฐานการโอนเงิน (สลิป):
+      <input type="file" id="slipFile" accept=".jpg,.jpeg,.png,.pdf">
+    </label>
+    <p class="upload-hint">อัปโหลดรูปภาพสลิป หรือไฟล์ PDF ขนาดไม่เกิน 10MB</p>
+  </div>
+
+  <div class="actions" style="justify-content: flex-end; margin-top: 1.5rem;">
+    <button class="btn ghost" type="button" onclick="document.getElementById('paymentDlg').close()">ยกเลิก</button>
+    <button class="btn" type="button" id="btnConfirmPayment">ยืนยันการโอนเงิน</button>
+  </div>
+  <p id="paymentMsg" class="msg"></p>
+</dialog>
+
+<style>
+  /* สไตล์เสริมสำหรับ Modal */
+  .modal-dialog { border: none; border-radius: 8px; padding: 20px; max-width: 500px; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .modal-dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+  .bank-info-box { background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #ddd; }
+  .bank-info-box p { margin: 5px 0; }
+</style>
+
 <footer class="site-footer">
   <div class="wrap">
     <span>ระบบข้อมูลค่าตอบแทนการสอน &middot; มหาวิทยาลัยธรรมศาสตร์ ศูนย์ลำปาง</span>
