@@ -20,6 +20,7 @@
       <a href="#rules">เกณฑ์การนับชั่วโมง</a>
       <a href="#process">กระบวนการเบิกจ่าย</a>
       <a href="#documents">เอกสารประกอบ</a>
+      <a href="#bank" data-roles="Teacher TA" hidden>บัญชีรับเงิน</a>
       <a href="#claim" data-roles="Teacher TA" hidden>ยื่นคำขอ</a>
       <a href="#claims" data-roles="Teacher TA Officer Approver Admin Administrators" hidden>รายการคำขอ</a>
       <a href="#review" data-roles="Officer Approver" hidden>ตรวจสอบ/อนุมัติ</a>
@@ -138,6 +139,28 @@
     </div>
   </section>
 
+  <section id="bank" class="section wrap" data-roles="Teacher TA" hidden>
+    <h2><span class="num">04+</span>บัญชีรับเงินของฉัน</h2>
+    <p class="section-lede">บันทึกบัญชีปลายทางที่จะรับค่าตอบแทน ระบบเก็บและแสดงเฉพาะเลขแบบปกปิด (เช่น xxx-x-x1234-x) เจ้าหน้าที่การเงินเห็นเฉพาะบัญชีของผู้ขอที่ได้รับอนุมัติ ในการทดสอบให้ใช้เลขจำลองเท่านั้น</p>
+
+    <div class="form-card">
+      <label>ธนาคาร
+        <input id="bankCode" type="text" placeholder="เช่น KBANK" maxlength="20" autocomplete="off">
+      </label>
+      <label>เลขบัญชี
+        <input id="bankNumber" type="text" inputmode="numeric" placeholder="เช่น xxx-x-x1234-x (เลขจำลอง)" maxlength="20" autocomplete="off">
+      </label>
+      <label>ชื่อบัญชี
+        <input id="bankName" type="text" maxlength="100" autocomplete="off">
+      </label>
+      <p id="bankCurrent" class="estimate">กำลังโหลดข้อมูลบัญชี...</p>
+      <div class="actions">
+        <button id="btnSaveBank" class="btn" type="button">บันทึกบัญชี</button>
+      </div>
+      <p id="bankMsg" class="msg" role="status"></p>
+    </div>
+  </section>
+
   <section id="claim" class="section wrap" data-roles="Teacher TA" hidden>
     <h2><span class="num">05</span>สร้างคำขอเบิกค่าตอบแทน</h2>
     <p class="section-lede">กรอกข้อมูล แล้วเลือกบันทึกร่างหรือยื่นคำขอ ระบบจะตรวจกฎและคำนวณยอดให้ บทบาทของคุณถูกกำหนดจากบัญชีที่เข้าสู่ระบบ</p>
@@ -189,7 +212,7 @@
     </div>
   </section>
 
-  <section id="claims" class="section wrap" data-roles="Teacher TA Officer Approver Admin Administrators" hidden>
+  <section id="claims" class="section wrap" data-roles="Teacher TA Officer Approver Admin Administrators" hidden>รหัสธนาคาร
     <h2><span class="num">06</span>รายการคำขอ</h2>
     <p class="section-lede">ผู้ขอเห็นเฉพาะคำขอของตนเอง เจ้าหน้าที่และผู้อนุมัติเห็นคำขอที่ยื่นแล้วทั้งหมด</p>
     <div class="filters">

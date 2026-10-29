@@ -305,11 +305,10 @@ function openPaymentModal(claimId) {
   currentPayClaimId = claimId;
   
   // สมมติว่าใน API ได้ Join ข้อมูลบัญชีแนบมาใน Object ชื่อ bankInfo แล้ว
-  const bankHtml = c.bankInfo 
-    ? `<p><strong>ธนาคาร:</strong> ${escapeHtml(c.bankInfo.bankCode)}</p>
-       <p><strong>เลขบัญชี:</strong> ${escapeHtml(c.bankInfo.accountNumber)}</p>
+  const bankHtml = c.bankInfo
+    ? `<p><strong>บัญชีปลายทาง:</strong> ${escapeHtml(c.bankInfo.bankCode)} • ${escapeHtml(c.bankInfo.accountMask)}</p>
        <p><strong>ชื่อบัญชี:</strong> ${escapeHtml(c.bankInfo.accountName)}</p>`
-    : `<p style="color: red;"><strong>ยังไม่พบข้อมูลบัญชีของเบิกผู้เบิก!</strong></p>`;
+    : `<p style="color: red;"><strong>ผู้ขอยังไม่ได้บันทึกบัญชีรับเงิน</strong></p>`;
 
   $("paymentBankInfo").innerHTML = `
     <p><strong>ชื่อผู้ขอเบิก:</strong> ${escapeHtml(c.claimantName)}</p>
@@ -380,6 +379,51 @@ $("btnSubmit").addEventListener("click", () => submitClaim("SUBMITTED"));
 $("btnCancel").addEventListener("click", () => resetForm());
 $("fTerm").addEventListener("change", loadClaims);
 $("fStatus").addEventListener("change", loadClaims);
+
+// ---------- บัญชีรับเงินของฉัน (ระบบเก็บเฉพาะเลขแบบปกปิด) ----------
+function showMyBank(b) {
+  $("bankCurrent").textContent = b && b.registered
+    ? `บัญชีที่บันทึกไว้: ${b.bankCode} • ${b.accountMask} (${b.accountName})`
+    : "ยังไม่ได้บันทึกบัญชีรับเงิน";
+  if (b && b.registered) {
+    $("bankCode").value = b.bankCode;
+    $("bankName").value = b.accountName;
+  }
+}
+
+async function loadMyBank() {
+  if (!hasRole("Teacher", "TA")) return;
+  try {
+    showMyBank(await api("/me/bank"));
+  } catch (e) {
+    $("bankCurrent").textContent = "โหลดข้อมูลบัญชีไม่ได้: " + e.message;
+  }
+}
+
+$("btnSaveBank").addEventListener("click", async () => {
+  const msg = $("bankMsg");
+  msg.className = "msg";
+  msg.textContent = "กำลังบันทึก...";
+  try {
+    const saved = await api("/me/bank", {
+      method: "POST",
+      body: JSON.stringify({
+        bankCode: $("bankCode").value.trim(),
+        accountNumber: $("bankNumber").value.trim(),
+        accountName: $("bankName").value.trim(),
+      }),
+    });
+    $("bankNumber").value = ""; // ไม่ทิ้งเลขเต็มไว้บนหน้าจอ
+    showMyBank(saved);
+    msg.textContent = "บันทึกบัญชีแล้ว (ระบบเก็บเฉพาะเลขที่ปกปิด)";
+    msg.classList.add("ok");
+  } catch (e) {
+    msg.textContent = e.message;
+    msg.classList.add("err");
+  }
+});
+
+document.addEventListener("auth-ready", () => { if (ME) loadMyBank(); });
 
 // loadClaims() / loadReview() ถูกเรียกใน review.js ตอน auth-ready
 loadTypes();
