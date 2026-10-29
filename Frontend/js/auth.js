@@ -40,7 +40,7 @@ async function handleCallback() {
   history.replaceState({}, "", AUTH.redirect); // ลบ ?code= ออกจาก URL
 }
 
-// ข้อมูลผู้ใช้จาก token (ใช้แสดงผลเท่านั้น ห้ามใช้ตัดสินสิทธิ์จริง)
+// ข้อมูลผู้ใช้จาก token (ใช้แสดงผลเท่านั้น ห้ามใช้ตัดสินสิทธิ์จริง) - - 
 function currentUser() {
   const t = sessionStorage.getItem("id_token");
   if (!t) return null;
