@@ -8,7 +8,7 @@ const HISTORY = process.env.HISTORY_TABLE || "ClaimHistory";
 const reply = (code, body) => ({ statusCode: code, headers: { "Content-Type": "application/json" /* + cors เดิม */ }, body: JSON.stringify(body) });
 
 // ---------- 1) ตัวตนมาจาก token ที่ API Gateway ตรวจแล้วเท่านั้น (ไม่อ่านจาก body) ----------
-export function getUser(event) {
+export function getUser(event) {ฏ
   const c = event.requestContext?.authorizer?.jwt?.claims;
   if (!c) return null;
   let g = c["cognito:groups"] || [];
@@ -17,7 +17,7 @@ export function getUser(event) {
   return { sub: c.sub, name: c.email || c["cognito:username"], groups: g };
 }
 export const has = (u, ...gs) => gs.some((g) => u.groups.includes(g));
-const STAFF = ["Officer", "Approver", "Admin"];
+const STAFF = ["Officer", "Approver", "Admin", "Administrators"];
 
 // ---------- 2) กันดูข้อมูลคนอื่น (BOLA): เจ้าของ หรือเจ้าหน้าที่ (เห็นเฉพาะที่ไม่ใช่ร่าง) ----------
 export const canView = (u, claim) =>

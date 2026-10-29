@@ -19,6 +19,7 @@ async function login() {
 
 function logout() {
   sessionStorage.clear();
+  //location.href = `${AUTH.domain}/logout?client_id=${AUTH.clientId}&logout_uri=${encodeURIComponent(AUTH.redirect)}`;
   location.href = `${AUTH.domain}/logout?client_id=${AUTH.clientId}&logout_uri=${encodeURIComponent(AUTH.redirect)}`;
 }
 
@@ -54,6 +55,9 @@ function currentUser() {
 let ME = null;
 const hasRole = (...r) => !!ME && r.some((x) => ME.groups.includes(x));
 
+const escAttr = (s) =>
+  String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
 // แสดง/ซ่อนส่วนของหน้าตามกลุ่ม (เพื่อความสะดวกของผู้ใช้ — การบังคับสิทธิ์จริงอยู่ที่ Lambda)
 function applyRoles() {
   document.querySelectorAll("[data-roles]").forEach((el) => {
@@ -61,7 +65,11 @@ function applyRoles() {
   });
   const box = document.getElementById("userBox");
   box.innerHTML = ME
-    ? `<span>${ME.email} (${ME.groups.join(", ") || "ไม่มีกลุ่ม"})</span> <button class="btn ghost small" onclick="logout()">ออกจากระบบ</button>`
+    ? `<div class="user-chip">
+         <span class="user-email" title="${escAttr(ME.email)}">${escAttr(ME.email)}</span>
+         <span class="user-role">${escAttr(ME.groups.join(", ") || "ไม่มีกลุ่ม")}</span>
+       </div>
+       <button class="btn ghost small" onclick="logout()">ออกจากระบบ</button>`
     : `<button class="btn small" onclick="login()">เข้าสู่ระบบ</button>`;
 }
 
