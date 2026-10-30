@@ -4,7 +4,8 @@ const REVIEW = {
   VERIFIED: { role: "Approver", actions: [["APPROVE", "อนุมัติ"], ["REJECT", "ไม่อนุมัติ"], ["RETURN", "ส่งกลับ"]] },
 };
 const NEED_REASON = ["RETURN", "REJECT"];
-const ACTION_TH = { SUBMIT: "ยื่นคำขอ", VERIFY: "ตรวจผ่าน", APPROVE: "อนุมัติ", REJECT: "ไม่อนุมัติ", RETURN: "ส่งกลับ" };
+const ACTION_TH = { SUBMIT: "ยื่นคำขอ", VERIFY: "ตรวจผ่าน", APPROVE: "อนุมัติ", REJECT: "ไม่อนุมัติ", RETURN: "ส่งกลับ",
+  PAY: "จ่ายเงิน", SAVE_DRAFT: "บันทึกร่าง", DELETE: "ลบคำขอ" };
 
 async function loadReview() {
   if (!hasRole("Officer", "Approver")) return;

@@ -15,6 +15,7 @@ let files = [];
 const STATUS = {
   DRAFT: "ร่าง", SUBMITTED: "ยื่นแล้ว", VERIFIED: "ตรวจแล้ว",
   APPROVED: "อนุมัติ", REJECTED: "ไม่อนุมัติ", RETURNED: "ส่งกลับแก้ไข",
+  PAID: "จ่ายแล้ว",
 };
 
 // ---------- เรียก API (แนบ ID token ทุกครั้ง) ----------
@@ -343,19 +344,16 @@ $("btnConfirmPayment").addEventListener("click", async () => {
   $("btnConfirmPayment").disabled = true;
 
   try {
-    // 1. เรียกใช้ฟังก์ชันเดิมเพื่ออัปโหลดไฟล์ขึ้น S3 (อาจจะตั้ง status เป็น PAID เพื่อให้แยกโฟลเดอร์ใน S3 ง่ายๆ)
-    const slipS3Key = await uploadToS3(file, "PAID");
-
-    msg.textContent = "อัปโหลดสำเร็จ กำลังอัปเดตสถานะการเบิกจ่าย...";
-
-    // 2. เรียก API (Lambda) เพื่อเปลี่ยนสถานะคำขอเป็น PAID พร้อมส่ง Key ของสลิปไปเก็บใน DB
-    await api("/claims/pay", {
-      method: "POST", // หรือ PUT ตามที่คุณออกแบบ API ไว้
-      body: JSON.stringify({
-        claimId: currentPayClaimId,
-        paymentSlipKey: slipS3Key,
-        status: "PAID"
-      })
+    const { uploadURL, fileKey } = await api("/get-slip-upload-url", {
+      method: "POST",
+      body: JSON.stringify({ claimId: currentPayClaimId, fileName: file.name, fileType: file.type }),
+    });
+    const up = await fetch(uploadURL, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+    if (!up.ok) throw new Error("อัปโหลดสลิปไม่สำเร็จ");
+    msg.textContent = "อัปโหลดสำเร็จ กำลังบันทึกการจ่ายเงิน...";
+    await api(`/claims/${currentPayClaimId}/action`, {
+      method: "POST",
+      body: JSON.stringify({ action: "PAY", paymentSlipKey: fileKey }),
     });
 
     document.getElementById('paymentDlg').close();

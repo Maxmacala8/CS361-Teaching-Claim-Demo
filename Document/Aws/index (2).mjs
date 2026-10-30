@@ -8,7 +8,8 @@
 //   DELETE /claims                     ลบ (เจ้าของ + DRAFT/RETURNED)
 //   POST   /get-upload-url             presigned PUT
 //   POST   /get-download-url           presigned GET (ตรวจ claimId + fileKey)
-//   POST   /claims/{id}/action         VERIFY / RETURN / APPROVE / REJECT
+//   POST   /get-slip-upload-url        presigned PUT สลิปโอนเงิน (Admin, คำขอ APPROVED)
+//   POST   /claims/{id}/action         VERIFY / RETURN / APPROVE / REJECT / PAY
 //   GET    /claims/{id}/history        ประวัติ
 //
 // CORS ตั้งที่ API Gateway ที่เดียว (ไม่ใส่ header ในโค้ดนี้)
@@ -58,6 +59,9 @@ const FLOW = {
     APPROVE: { to: "APPROVED", group: "Approver" },
     REJECT: { to: "REJECTED", group: "Approver" },
     RETURN: { to: "RETURNED", group: "Approver" },
+  },
+  APPROVED: {
+    PAY: { to: "PAID", group: ["Admin", "Administrators"] },
   },
 };
 
@@ -307,22 +311,32 @@ async function claimAction(user, claimId, body) {
 
   const rule = FLOW[claim.status]?.[body.action];
   if (!rule) throw new HttpError(409, `สถานะ ${claim.status} ไม่สามารถ ${body.action} ได้`);
-  if (!has(user, rule.group)) throw new HttpError(403, "ไม่มีสิทธิ์ทำรายการนี้");
+  if (!has(user, ...[].concat(rule.group))) throw new HttpError(403, "ไม่มีสิทธิ์ทำรายการนี้");
   if (claim.ownerSub === user.sub) throw new HttpError(403, "ห้ามตรวจ/อนุมัติคำขอของตนเอง");
   if (["RETURN", "REJECT"].includes(body.action) && !String(body.comment || "").trim())
     throw new HttpError(400, "กรุณาระบุเหตุผล");
 
   const at = new Date().toISOString();
   const comment = String(body.comment || "").trim();
+  let update = "SET #s = :to, updatedAt = :at";
+  const values = { ":to": rule.to, ":from": claim.status, ":at": at };
+  if (body.action === "PAY") {
+    // สลิปต้องเป็นไฟล์ที่ออก URL ให้คำขอนี้เท่านั้น
+    const key = String(body.paymentSlipKey || "");
+    if (!key.startsWith(`slips/${claim.claimId}/`)) throw new HttpError(400, "กรุณาแนบสลิปการโอนเงิน");
+    update += ", paymentSlipKey = :slip, paidAt = :at, paidBy = :by";
+    values[":slip"] = key;
+    values[":by"] = user.name;
+  }
   await transact([
     {
       Update: {
         TableName: CLAIMS_TABLE,
         Key: { claimId: claim.claimId },
-        UpdateExpression: "SET #s = :to, updatedAt = :at",
+        UpdateExpression: update,
         ConditionExpression: "#s = :from", // กันสองคนกดพร้อมกัน
         ExpressionAttributeNames: { "#s": "status" },
-        ExpressionAttributeValues: { ":to": rule.to, ":from": claim.status, ":at": at },
+        ExpressionAttributeValues: values,
       },
     },
     { Put: { TableName: HISTORY_TABLE, Item: historyItem(claim.claimId, at, user, body.action, claim.status, rule.to, comment) } },
@@ -365,11 +379,31 @@ async function getUploadUrl(event, user) {
   return { uploadURL, fileKey };
 }
 
+// สลิปโอนเงิน: Admin เท่านั้น และคำขอต้องอนุมัติแล้ว
+async function getSlipUploadUrl(event, user) {
+  if (!has(user, "Admin", "Administrators")) throw new HttpError(403, "บัญชีนี้ไม่มีสิทธิ์บันทึกการจ่ายเงิน");
+  if (!BUCKET) throw new Error("BUCKET env var is not set");
+  const b = parseBody(event);
+  const claim = await getClaim(b.claimId);
+  if (!claim) throw new HttpError(404, "ไม่พบคำขอ");
+  if (claim.status !== "APPROVED") throw new HttpError(409, "คำขอนี้ยังไม่อยู่ในสถานะอนุมัติ");
+  const fileName = safeName(b.fileName);
+  const ext = fileName.split(".").pop().toLowerCase();
+  if (!["pdf", "jpg", "jpeg", "png", "webp"].includes(ext)) throw new HttpError(400, `ไม่รองรับไฟล์ .${ext}`);
+
+  const fileKey = `slips/${claim.claimId}/${randomUUID()}-${fileName}`;
+  const cmd = { Bucket: BUCKET, Key: fileKey };
+  if (b.fileType) cmd.ContentType = String(b.fileType);
+  const uploadURL = await getSignedUrl(s3, new PutObjectCommand(cmd), { expiresIn: 300 });
+  return { uploadURL, fileKey };
+}
+
 async function getDownloadUrl(event, user) {
   if (!BUCKET) throw new Error("BUCKET env var is not set");
   const { claimId, fileKey } = parseBody(event);
   const claim = await getClaim(claimId);
-  if (!claim || !canView(user, claim) || !(claim.attachments || []).includes(fileKey))
+  const allowed = [...(claim?.attachments || []), claim?.paymentSlipKey].filter(Boolean);
+  if (!claim || !canView(user, claim) || !allowed.includes(fileKey))
     throw new HttpError(404, "ไม่พบไฟล์");
   const downloadURL = await getSignedUrl(
     s3,
@@ -409,6 +443,7 @@ export const handler = async (event) => {
       if (method === "DELETE") return json(200, await deleteClaim(event, user));
     }
     if (method === "POST" && /\/get-upload-url\/?$/.test(path)) return json(200, await getUploadUrl(event, user));
+    if (method === "POST" && /\/get-slip-upload-url\/?$/.test(path)) return json(200, await getSlipUploadUrl(event, user));
     if (method === "POST" && /\/get-download-url\/?$/.test(path)) return json(200, await getDownloadUrl(event, user));
 
     return json(404, { message: "ไม่พบเส้นทางนี้" });

@@ -490,6 +490,11 @@ tr:last-child td {
   color: var(--brass);
 }
 
+.status.PAID {
+  background: rgba(46, 107, 63, 0.12);
+  color: var(--ok);
+}
+
 /* ===== Footer ===== */
 .site-footer {
   padding: 24px;
