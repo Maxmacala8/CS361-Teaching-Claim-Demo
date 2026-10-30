@@ -20,10 +20,12 @@
       <a href="#rules">เกณฑ์การนับชั่วโมง</a>
       <a href="#process">กระบวนการเบิกจ่าย</a>
       <a href="#documents">เอกสารประกอบ</a>
-      <a href="#bank" data-roles="Teacher TA" hidden>บัญชีรับเงิน</a>
       <a href="#claim" data-roles="Teacher TA" hidden>ยื่นคำขอ</a>
       <a href="#claims" data-roles="Teacher TA Officer Approver Admin Administrators" hidden>รายการคำขอ</a>
       <a href="#review" data-roles="Officer Approver" hidden>ตรวจสอบ/อนุมัติ</a>
+      <a href="#bank" data-roles="Teacher TA" hidden>บัญชีรับเงิน</a>
+      <a href="#course" data-roles="Teacher Staff Officer Approver Admin Administrators" hidden>สรุปรายวิชา</a>
+      <a href="#assist" data-roles="Student Teacher Staff Admin Administrators" hidden>นักศึกษาช่วยงาน</a>
     </nav>
     <span id="userBox"></span>
   </div>
@@ -139,28 +141,6 @@
     </div>
   </section>
 
-  <section id="bank" class="section wrap" data-roles="Teacher TA" hidden>
-    <h2><span class="num">04+</span>บัญชีรับเงินของฉัน</h2>
-    <p class="section-lede">บันทึกบัญชีปลายทางที่จะรับค่าตอบแทน ระบบเก็บและแสดงเฉพาะเลขแบบปกปิด (เช่น xxx-x-x1234-x) เจ้าหน้าที่การเงินเห็นเฉพาะบัญชีของผู้ขอที่ได้รับอนุมัติ ในการทดสอบให้ใช้เลขจำลองเท่านั้น</p>
-
-    <div class="form-card">
-      <label>รหัสธนาคาร
-        <input id="bankCode" type="text" placeholder="เช่น BANK-A" maxlength="20" autocomplete="off">
-      </label>
-      <label>เลขบัญชี
-        <input id="bankNumber" type="text" inputmode="numeric" placeholder="เช่น xxx-x-x1234-x (เลขจำลอง)" maxlength="20" autocomplete="off">
-      </label>
-      <label>ชื่อบัญชี
-        <input id="bankName" type="text" maxlength="100" autocomplete="off">
-      </label>
-      <p id="bankCurrent" class="estimate">กำลังโหลดข้อมูลบัญชี...</p>
-      <div class="actions">
-        <button id="btnSaveBank" class="btn" type="button">บันทึกบัญชี</button>
-      </div>
-      <p id="bankMsg" class="msg" role="status"></p>
-    </div>
-  </section>
-
   <section id="claim" class="section wrap" data-roles="Teacher TA" hidden>
     <h2><span class="num">05</span>สร้างคำขอเบิกค่าตอบแทน</h2>
     <p class="section-lede">กรอกข้อมูล แล้วเลือกบันทึกร่างหรือยื่นคำขอ ระบบจะตรวจกฎและคำนวณยอดให้ บทบาทของคุณถูกกำหนดจากบัญชีที่เข้าสู่ระบบ</p>
@@ -230,6 +210,8 @@
         <option value="APPROVED">อนุมัติ</option>
         <option value="REJECTED">ไม่อนุมัติ</option>
         <option value="RETURNED">ส่งกลับแก้ไข</option>
+        <option value="SIGNED_DOCS_RECEIVED">บันทึกการรับหลักฐานแล้ว</option>
+        <option value="PAID">จ่ายแล้ว</option>
       </select>
     </div>
     <div class="table-card">
@@ -256,6 +238,50 @@
         <tbody id="reviewRows"><tr><td colspan="7">กำลังโหลดข้อมูล...</td></tr></tbody>
       </table>
     </div>
+  </section>
+
+  <section id="bank" class="section wrap" data-roles="Teacher TA" hidden>
+    <h2><span class="num">08</span>บัญชีรับเงินของฉัน</h2>
+    <p class="section-lede">ระบบเก็บเฉพาะเลขบัญชีแบบปกปิด ผู้อื่นเห็นได้เฉพาะฝ่ายการเงินตอนจ่าย</p>
+    <div class="form-card">
+      <p id="bankCurrent" class="msg">กำลังโหลด...</p>
+      <label>ธนาคาร <input id="bankCode" type="text" placeholder="เช่น BANK-A"></label>
+      <label>เลขบัญชี <input id="bankNumber" type="text" inputmode="numeric" autocomplete="off" placeholder="10-12 หลัก"></label>
+      <label>ชื่อบัญชี <input id="bankName" type="text"></label>
+      <div class="actions"><button id="btnSaveBank" class="btn" type="button">บันทึกบัญชี</button></div>
+      <p id="bankMsg" class="msg" role="status"></p>
+    </div>
+  </section>
+
+  <section id="course" class="section wrap" data-roles="Teacher Staff Officer Approver Admin Administrators" hidden>
+    <h2><span class="num">09</span>สรุปชั่วโมงรายวิชาตามรอบเบิก</h2>
+    <p class="section-lede">เทียบคาบสอนตามตารางกับคำขอเบิกในรอบเดียวกัน คาบหนึ่งนับได้ครั้งเดียว อาจารย์เห็นเฉพาะรายวิชาของตนเอง</p>
+    <div class="filters">
+      <input id="courseId" class="filters-input" value="CS361-SP-1-2569" aria-label="รหัสรายวิชา">
+      <select id="courseRound" aria-label="รอบเบิก">
+        <option>OCT-2569</option><option>SEP-2569</option><option>NOV-2569</option><option value="">ทุกรอบ</option>
+      </select>
+      <button id="btnCourse" class="btn small" type="button">แสดง</button>
+    </div>
+    <div id="courseBox"></div>
+  </section>
+
+  <section id="assist" class="section wrap" data-roles="Student Teacher Staff Admin Administrators" hidden>
+    <h2><span class="num">10</span>ชั่วโมงนักศึกษาช่วยงาน</h2>
+    <p class="section-lede">ชั่วโมงที่กรอก / รับรอง / รอตรวจ แยกกัน การกดรับรองในระบบไม่ใช่ลายเซ็นจริง เจ้าหน้าที่ออกเอกสารให้อาจารย์ลงนามบนกระดาษ แล้วบันทึกการรับหลักฐาน</p>
+    <div class="table-card">
+      <table>
+        <thead><tr><th>นักศึกษา</th><th>รายวิชา</th><th>กรอก</th><th>รับรอง</th><th>รอตรวจ</th><th>สถานะ</th><th>หลักฐาน</th><th>ดำเนินการ</th></tr></thead>
+        <tbody id="assistRows"><tr><td colspan="8">กำลังโหลดข้อมูล...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="admin" class="section wrap" data-roles="Admin Administrators" hidden>
+    <h2><span class="num">11</span>ข้อมูลทดสอบ</h2>
+    <p class="section-lede">รีเซ็ตเฉพาะข้อมูลทดสอบกลับ baseline ไม่แตะคำขอจริงอื่น</p>
+    <button id="btnReset" class="btn ghost" type="button">รีเซ็ตข้อมูลทดสอบ</button>
+    <p id="resetMsg" class="msg" role="status"></p>
   </section>
 
 </main>
@@ -304,5 +330,6 @@
 <script src="js/auth.js"></script>
 <script src="js/app.js"></script>
 <script src="js/review.js"></script>
+<script src="js/v3.js"></script>
 </body>
 </html>

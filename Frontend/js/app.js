@@ -15,7 +15,7 @@ let files = [];
 const STATUS = {
   DRAFT: "ร่าง", SUBMITTED: "ยื่นแล้ว", VERIFIED: "ตรวจแล้ว",
   APPROVED: "อนุมัติ", REJECTED: "ไม่อนุมัติ", RETURNED: "ส่งกลับแก้ไข",
-  PAID: "จ่ายแล้ว",
+  PAID: "จ่ายแล้ว", SIGNED_DOCS_RECEIVED: "บันทึกการรับหลักฐานแล้ว",
 };
 
 // ---------- เรียก API (แนบ ID token ทุกครั้ง) ----------
@@ -46,6 +46,21 @@ async function loadTypes() {
       .join("");
   } catch (e) {
     $("typeRows").innerHTML = `<tr><td colspan="4">โหลดข้อมูลไม่ได้: ${escapeHtml(e.message)}</td></tr>`;
+  }
+}
+
+// ---------- ภาคการศึกษา (โหลดจากตาราง Terms เปิดดูได้โดยไม่ต้องล็อกอิน) ----------
+async function loadTerms() {
+  try {
+    const terms = await api("/terms");
+    const opts = terms
+      .map((t) => `<option value="${escapeHtml(t.termId)}">${escapeHtml(t.name || t.termId)}</option>`)
+      .join("");
+    $("term").innerHTML = opts;
+    const f = $("fTerm"); // ตัวกรอง: เก็บตัวเลือกแรก (ทั้งหมด) ไว้
+    if (f) f.innerHTML = (f.options[0] ? f.options[0].outerHTML : "") + opts;
+  } catch (e) {
+    console.error("โหลดภาคการศึกษาไม่ได้", e);
   }
 }
 
@@ -425,3 +440,4 @@ document.addEventListener("auth-ready", () => { if (ME) loadMyBank(); });
 
 // loadClaims() / loadReview() ถูกเรียกใน review.js ตอน auth-ready
 loadTypes();
+loadTerms();

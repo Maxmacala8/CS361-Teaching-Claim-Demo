@@ -643,3 +643,6 @@ tr:last-child td {
     padding: 18px;
   }
 }
+/* V3: สถานะเพิ่มเติม + ช่องรหัสวิชาในแถบกรอง */
+.status.SIGNED_DOCS_RECEIVED { background: rgba(31, 58, 62, 0.14); color: var(--navy-deep); }
+.filters-input { padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; font-family: inherit; font-size: 14px; }

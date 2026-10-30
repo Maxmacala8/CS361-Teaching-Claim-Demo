@@ -5,21 +5,24 @@ const REVIEW = {
 };
 const NEED_REASON = ["RETURN", "REJECT"];
 const ACTION_TH = { SUBMIT: "ยื่นคำขอ", VERIFY: "ตรวจผ่าน", APPROVE: "อนุมัติ", REJECT: "ไม่อนุมัติ", RETURN: "ส่งกลับ",
-  PAY: "จ่ายเงิน", SAVE_DRAFT: "บันทึกร่าง", DELETE: "ลบคำขอ" };
+  PAY: "จ่ายเงิน", SAVE_DRAFT: "บันทึกร่าง", DELETE: "ลบคำขอ",
+  VIEW_FILE: "เปิดไฟล์แนบ", BANK_UPDATE: "แก้ไขบัญชีรับเงิน", SEED: "ข้อมูลตั้งต้น",
+  ASSIST_CONFIRM: "นักศึกษายืนยันชั่วโมง", ASSIST_VERIFY: "อาจารย์รับรองชั่วโมง",
+  ASSIST_ISSUE_DOC: "ออกเอกสารให้ลงนาม", ASSIST_RECEIVE_EVIDENCE: "บันทึกการรับหลักฐาน" };
 
 async function loadReview() {
   if (!hasRole("Officer", "Approver")) return;
-  const status = hasRole("Officer") ? "SUBMITTED" : "VERIFIED"; // Officer+Approver พร้อมกัน: ดูคิวตรวจก่อน
+  // อยู่หลายกลุ่ม: แสดงทุกคิวที่มีสิทธิ์ (Lambda บังคับ maker-checker เอง)
+  const statuses = Object.keys(REVIEW).filter((s) => hasRole(REVIEW[s].role));
   try {
-    const rows = await api("/claims?status=" + status);
-    const acts = REVIEW[status].actions;
+    const rows = (await Promise.all(statuses.map((s) => api("/claims?status=" + s)))).flat();
     $("reviewRows").innerHTML = rows.length
-      ? rows.map((c) => `<tr>
+      ? rows.map((c) => { const acts = REVIEW[c.status].actions; return `<tr>
           <td>${c.claimId.slice(0, 8)}</td><td>${c.claimantName}</td><td>${c.typeName}</td>
           <td>${c.course} (${c.term})</td><td>${c.hours}</td><td class="rate">${baht(c.amount)}</td>
           <td>${acts.map(([a, t]) => `<button class="btn small ${a === "APPROVE" || a === "VERIFY" ? "" : "ghost"}"
                 onclick="doAction('${c.claimId}','${a}')">${t}</button>`).join(" ")}
-              <button class="btn small ghost" onclick="showHistory('${c.claimId}')">ประวัติ</button></td></tr>`).join("")
+              <button class="btn small ghost" onclick="showHistory('${c.claimId}')">ประวัติ</button></td></tr>`; }).join("")
       : '<tr><td colspan="7">ไม่มีคำขอรอดำเนินการ</td></tr>';
   } catch (e) {
     $("reviewRows").innerHTML = `<tr><td colspan="7">โหลดข้อมูลไม่ได้: ${e.message}</td></tr>`;
