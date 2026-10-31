@@ -52,6 +52,6 @@ Open questions / To validate
 
 Link Host(S3) : http://forhostteaching-claim-demo.s3-website-us-east-1.amazonaws.com/
 
-Link Host(S3)ใหม่ : https://cs361-claim-demo-g13.s3.us-east-1.amazonaws.com/index.html
+Link Host(S3)ใหม่ : https://maxmacala8.github.io/CS361-Teaching-Claim-Demo/Frontend/index.html 
 
 Link สำหรับเข้าทั่วไป : https://maxmacala8.github.io/CS361-Teaching-Claim-Demo/Frontend/index.html
