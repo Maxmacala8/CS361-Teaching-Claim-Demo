@@ -77,5 +77,9 @@ function applyRoles() {
   await handleCallback();
   ME = currentUser();
   applyRoles();
+  // รอให้ app.js และ review.js โหลดและผูก listener เสร็จก่อน (ไม่เช่นนั้นกด Refresh แล้วรายการคำขอไม่โหลด)
+  if (document.readyState === "loading") {
+    await new Promise((r) => document.addEventListener("DOMContentLoaded", r, { once: true }));
+  }
   document.dispatchEvent(new Event("auth-ready"));
 })();

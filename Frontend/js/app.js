@@ -14,8 +14,7 @@ let files = [];
 
 const STATUS = {
   DRAFT: "ร่าง", SUBMITTED: "ยื่นแล้ว", VERIFIED: "ตรวจแล้ว",
-  APPROVED: "อนุมัติ", REJECTED: "ไม่อนุมัติ", RETURNED: "ส่งกลับแก้ไข",
-  PAID: "จ่ายแล้ว", SIGNED_DOCS_RECEIVED: "บันทึกการรับหลักฐานแล้ว",
+  APPROVED: "อนุมัติ", PAID: "จ่ายแล้ว", REJECTED: "ไม่อนุมัติ", RETURNED: "ส่งกลับแก้ไข",
 };
 
 // ---------- เรียก API (แนบ ID token ทุกครั้ง) ----------
@@ -46,21 +45,6 @@ async function loadTypes() {
       .join("");
   } catch (e) {
     $("typeRows").innerHTML = `<tr><td colspan="4">โหลดข้อมูลไม่ได้: ${escapeHtml(e.message)}</td></tr>`;
-  }
-}
-
-// ---------- ภาคการศึกษา (โหลดจากตาราง Terms เปิดดูได้โดยไม่ต้องล็อกอิน) ----------
-async function loadTerms() {
-  try {
-    const terms = await api("/terms");
-    const opts = terms
-      .map((t) => `<option value="${escapeHtml(t.termId)}">${escapeHtml(t.name || t.termId)}</option>`)
-      .join("");
-    $("term").innerHTML = opts;
-    const f = $("fTerm"); // ตัวกรอง: เก็บตัวเลือกแรก (ทั้งหมด) ไว้
-    if (f) f.innerHTML = (f.options[0] ? f.options[0].outerHTML : "") + opts;
-  } catch (e) {
-    console.error("โหลดภาคการศึกษาไม่ได้", e);
   }
 }
 
@@ -359,16 +343,19 @@ $("btnConfirmPayment").addEventListener("click", async () => {
   $("btnConfirmPayment").disabled = true;
 
   try {
-    const { uploadURL, fileKey } = await api("/get-slip-upload-url", {
-      method: "POST",
-      body: JSON.stringify({ claimId: currentPayClaimId, fileName: file.name, fileType: file.type }),
-    });
-    const up = await fetch(uploadURL, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
-    if (!up.ok) throw new Error("อัปโหลดสลิปไม่สำเร็จ");
-    msg.textContent = "อัปโหลดสำเร็จ กำลังบันทึกการจ่ายเงิน...";
-    await api(`/claims/${currentPayClaimId}/action`, {
-      method: "POST",
-      body: JSON.stringify({ action: "PAY", paymentSlipKey: fileKey }),
+    // 1. เรียกใช้ฟังก์ชันเดิมเพื่ออัปโหลดไฟล์ขึ้น S3 (อาจจะตั้ง status เป็น PAID เพื่อให้แยกโฟลเดอร์ใน S3 ง่ายๆ)
+    const slipS3Key = await uploadToS3(file, "PAID");
+
+    msg.textContent = "อัปโหลดสำเร็จ กำลังอัปเดตสถานะการเบิกจ่าย...";
+
+    // 2. เรียก API (Lambda) เพื่อเปลี่ยนสถานะคำขอเป็น PAID พร้อมส่ง Key ของสลิปไปเก็บใน DB
+    await api("/claims/pay", {
+      method: "POST", // หรือ PUT ตามที่คุณออกแบบ API ไว้
+      body: JSON.stringify({
+        claimId: currentPayClaimId,
+        paymentSlipKey: slipS3Key,
+        status: "PAID"
+      })
     });
 
     document.getElementById('paymentDlg').close();
@@ -402,6 +389,7 @@ function showMyBank(b) {
     $("bankCode").value = b.bankCode;
     $("bankName").value = b.accountName;
   }
+  document.dispatchEvent(new CustomEvent("bank-updated", { detail: b })); // ให้การ์ดบนแดชบอร์ดอัปเดต (ui.js)
 }
 
 async function loadMyBank() {
@@ -440,4 +428,3 @@ document.addEventListener("auth-ready", () => { if (ME) loadMyBank(); });
 
 // loadClaims() / loadReview() ถูกเรียกใน review.js ตอน auth-ready
 loadTypes();
-loadTerms();

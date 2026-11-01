@@ -6,149 +6,124 @@
   <title>ระบบเบิกค่าตอบแทนการสอน</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/index.css">
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
 </head>
-<body>
+<body id="top">
+<a class="skip" href="#main">ข้ามไปยังเนื้อหา</a>
 
 <header class="site-header">
   <div class="wrap header-inner">
-    <span class="mark">ระบบข้อมูลค่าตอบแทนการสอน</span>
-    <nav class="nav">
-      <a href="#rates">อัตราค่าตอบแทน</a>
-      <a href="#rules">เกณฑ์การนับชั่วโมง</a>
-      <a href="#process">กระบวนการเบิกจ่าย</a>
-      <a href="#documents">เอกสารประกอบ</a>
+    <a class="brand" href="#top" aria-label="ระบบข้อมูลค่าตอบแทนการสอน">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="12" fill="#141414"/><g transform="translate(2 2) scale(0.5625)"><defs><mask id="brandCut" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect x="0" y="0" width="64" height="64" fill="#fff"/><circle cx="32" cy="19" r="14.5" fill="#000"/></mask></defs><g fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" mask="url(#brandCut)"><path d="M32 26 C26 21 16 20 8 22 V50 C16 48 26 49 32 54"/><path d="M32 26 C38 21 48 20 56 22 V50 C48 48 38 49 32 54"/><path d="M32 26 V54"/></g><circle cx="32" cy="19" r="11" fill="#D4501A"/><g transform="translate(31.45 19.39) scale(0.78)" fill="none" stroke="#ffffff" stroke-width="2.69" stroke-linecap="round" stroke-linejoin="round"><path d="M-3.5 -7 H0.8 A3.25 3.25 0 0 1 0.8 -0.5 H-3.5"/><path d="M-3.5 -0.5 H1.6 A3.25 3.25 0 0 1 1.6 6 H-3.5"/><path d="M-3.5 -7 V6"/><path d="M-0.5 -9.5 V-7"/><path d="M-0.5 6 V8.5"/></g></g></svg>
+      <span class="brand-text"><strong>ค่าตอบแทนการสอน</strong><small>ธรรมศาสตร์ ศูนย์ลำปาง</small></span>
+    </a>
+    <nav class="pill-nav" aria-label="เมนูหลัก">
+      <a href="#dashboard" data-roles="Teacher TA Officer Approver Admin Administrators" hidden>ภาพรวม</a>
+      <a href="#review" data-roles="Officer Approver" hidden>ตรวจสอบ/อนุมัติ</a>
       <a href="#claim" data-roles="Teacher TA" hidden>ยื่นคำขอ</a>
       <a href="#claims" data-roles="Teacher TA Officer Approver Admin Administrators" hidden>รายการคำขอ</a>
-      <a href="#review" data-roles="Officer Approver" hidden>ตรวจสอบ/อนุมัติ</a>
       <a href="#bank" data-roles="Teacher TA" hidden>บัญชีรับเงิน</a>
-      <a href="#course" data-roles="Teacher Staff Officer Approver Admin Administrators" hidden>สรุปรายวิชา</a>
-      <a href="#assist" data-roles="Student Teacher Staff Admin Administrators" hidden>นักศึกษาช่วยงาน</a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <a href="#rates">อัตรา</a>
+      <a href="#rules">เกณฑ์</a>
+      <a href="#process">ขั้นตอน</a>
+      <a href="#documents">เอกสาร</a>
     </nav>
-    <span id="userBox"></span>
+    <div id="userBox"></div>
   </div>
 </header>
 
+<main id="main">
 
-<main>
-
-  <section class="hero wrap">
-    <p class="eyebrow">ประกาศและระเบียบที่เกี่ยวข้อง &middot; ศูนย์ลำปาง</p>
+  <section class="hero wrap" id="intro">
+    <p class="eyebrow">ประกาศและระเบียบที่เกี่ยวข้องของศูนย์ลำปาง</p>
     <h1>หลักเกณฑ์และอัตราการจ่ายเงินค่าตอบแทนการสอน</h1>
     <p class="hero-lede">
       สรุปข้อมูลตามระเบียบมหาวิทยาลัยธรรมศาสตร์ ว่าด้วยหลักเกณฑ์และอัตราการจ่ายเงินค่าตอบแทนแก่บุคลากรทางการศึกษาของศูนย์ลำปาง พ.ศ. ๒๕๕๑ และระเบียบกระทรวงการคลัง พ.ศ. ๒๕๕๑ เข้าสู่ระบบเพื่อยื่นคำขอ ตรวจสอบ และอนุมัติตามสิทธิ์ของแต่ละบทบาท
     </p>
+    <div class="hero-actions">
+      <button class="btn-pill big" type="button" onclick="login()">เข้าสู่ระบบเพื่อยื่นคำขอ</button>
+      <a class="btn-pill big light" href="#rates">ดูอัตราค่าตอบแทน</a>
+    </div>
   </section>
 
-  <section id="rates" class="section wrap">
-    <h2><span class="num">01</span>ประเภทและอัตราค่าตอบแทน</h2>
-    <p class="section-lede">ข้อมูลดึงจากฐานข้อมูลกฎ จึงเพิ่มหรือปรับประเภทค่าตอบแทนได้โดยไม่ต้องแก้โค้ด</p>
+  <section id="dashboard" class="dash wrap" data-roles="Teacher TA Officer Approver Admin Administrators" hidden>
+    <div class="dash-head">
+      <div>
+        <p class="eyebrow">ติดตามคำขอเบิกค่าตอบแทนของคุณได้ในที่เดียว</p>
+        <h1 class="greet">ยินดีต้อนรับ, <span id="dashName">ผู้ใช้</span>!</h1>
+      </div>
+      <div class="dash-cta">
+        <a class="btn-pill big" href="#claim" data-roles="Teacher TA" hidden>ยื่นคำขอใหม่</a>
+        <a class="btn-pill big" href="#review" data-roles="Officer Approver" hidden>ไปที่คิวตรวจสอบ</a>
+        <a class="btn-pill big" href="#claims" data-roles="Admin Administrators" hidden>ดูรายการคำขอ</a>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <article class="card ember overview" aria-labelledby="ovTitle">
+        <div class="card-head">
+          <h2 id="ovTitle">ภาพรวมคำขอ</h2>
+          <label class="pill-select"><span class="sr-only">เลือกปี (พ.ศ.)</span><select id="chartYear"></select></label>
+        </div>
+        <p class="kpi-label">ยอดรวมคำขอที่ยื่นแล้ว</p>
+        <p class="kpi">฿<span id="kpiInt">0</span><span class="dec" id="kpiDec">.00</span></p>
+        <p class="chip" id="kpiCount">0 คำขอที่ยื่นแล้ว</p>
+        <div class="chart" role="group" aria-label="ยอดคำขอรายเดือน">
+          <div class="plot" id="chartPlot"></div>
+          <div class="months" id="chartMonths" aria-hidden="true"></div>
+          <p class="chart-empty" id="chartEmpty"></p>
+        </div>
+        <p class="card-note">คำนวณจากรายการที่แสดงในตาราง &quot;รายการคำขอ&quot; ตามตัวกรองที่เลือก</p>
+      </article>
+
+      <article class="card ember" aria-labelledby="stTitle">
+        <div class="card-head">
+          <h2 id="stTitle">สถานะคำขอ</h2>
+        </div>
+        <p class="kpi-label">กำลังดำเนินการ</p>
+        <p class="kpi"><span id="pendingCount">0</span><span class="dec"> คำขอ</span></p>
+        <ul class="status-list" id="statusList"></ul>
+        <div class="bank-card" data-roles="Teacher TA" hidden>
+          <small>บัญชีรับเงิน <span id="dashBankCode">กำลังโหลด...</span></small>
+          <p class="mask" id="dashBankMask">—</p>
+          <small id="dashBankName"></small>
+        </div>
+        <div class="card-actions">
+          <a class="btn-pill white" href="#claim" data-roles="Teacher TA" hidden>ยื่นคำขอ</a>
+          <a class="btn-pill white" href="#bank" data-roles="Teacher TA" hidden>บัญชีรับเงิน</a>
+          <a class="btn-pill white" href="#review" data-roles="Officer Approver" hidden>ตรวจสอบ/อนุมัติ</a>
+        </div>
+      </article>
+    </div>
+
+    <h2 class="sub-title">แยกตามประเภทค่าตอบแทน</h2>
+    <div class="type-row" id="typeCards"></div>
+  </section>
+
+  <section id="review" class="section workspace" data-roles="Officer Approver" hidden>
+    <h2>คำขอรอตรวจสอบ/อนุมัติ</h2>
+    <p class="section-lede">เจ้าหน้าที่เห็นคำขอที่ยื่นแล้ว ผู้อนุมัติเห็นคำขอที่ตรวจผ่านแล้ว การส่งกลับหรือไม่อนุมัติต้องระบุเหตุผล</p>
     <div class="table-card">
       <table>
-        <thead><tr><th>ประเภท</th><th>ผู้มีสิทธิ์</th><th>เอกสารที่ต้องแนบ</th><th>อัตรา</th></tr></thead>
-        <tbody id="typeRows"><tr><td colspan="4">กำลังโหลดข้อมูล..</td></tr></tbody>
-      </table>
-    </div>
-    <div class="type-grid">
-      <article class="type-card">
-        <span class="type-tag">กระทรวงการคลัง (ระดับ ป.ตรี)</span>
-        <h3>ค่าสอนพิเศษ ปริญญาตรี</h3>
-        <p>อัตราชั่วโมงละ <strong>๔๐๐ บาท</strong></p>
-      </article>
-      <article class="type-card">
-        <span class="type-tag">กระทรวงการคลัง (ระดับบัณฑิตศึกษา)</span>
-        <h3>ค่าสอนพิเศษ บัณฑิตศึกษา</h3>
-        <p>อัตราชั่วโมงละ <strong>๕๔๐ บาท</strong></p>
-      </article>
-      <article class="type-card">
-        <span class="type-tag">ผู้ทรงคุณวุฒิภายนอก</span>
-        <h3>อาจารย์พิเศษภายนอก</h3>
-        <p>มิได้เป็นข้าราชการ/พนักงานรัฐวิสาหกิจ ได้รับเพิ่มอีก <strong>๑ เท่า</strong></p>
-      </article>
-    </div>
-  </section>
-
-  <section id="rules" class="section wrap">
-    <h2><span class="num">02</span>เกณฑ์การนับหน่วยชั่วโมงการสอน</h2>
-    <p class="section-lede">เงื่อนไขและระยะเวลาในการคำนวณเงินค่าตอบแทนตามประเภทการสอน</p>
-    <div class="type-grid">
-      <article class="type-card">
-        <span class="type-tag">ภาคทฤษฎี</span>
-        <h3>การสอนภาคทฤษฎี</h3>
-        <p>การบรรยาย สัมมนา อภิปราย ใน <strong>๑ ชั่วโมง ต้องใช้เวลาสอนไม่น้อยกว่า ๕๐ นาที</strong> ได้รับเงินค่าตอบแทนเท่ากับ <strong>๑ ชั่วโมง</strong></p>
-      </article>
-      <article class="type-card">
-        <span class="type-tag">ภาคปฏิบัติ</span>
-        <h3>การสอนภาคปฏิบัติ</h3>
-        <p>การควบคุมห้องแล็บ/ฝึกงานอย่างใกล้ชิด กำหนดให้การสอนภาคปฏิบัติ <strong>๒ ชั่วโมง คิดเป็นเงินค่าตอบแทนเท่ากับ ๑ ชั่วโมง</strong></p>
-      </article>
-    </div>
-    <div class="note-box">
-      <h4>ข้อกำหนดเรื่องคาบเวลา</h4>
-      <p>คำว่า <strong>"๑ คาบเวลา"</strong> หมายถึง เวลาที่ปฏิบัติหน้าที่ติดต่อกัน <strong>ไม่น้อยกว่า ๓ ชั่วโมง</strong></p>
-    </div>
-  </section>
-
-  <section id="process" class="section wrap">
-    <h2><span class="num">03</span>ขั้นตอนกระบวนการเบิกจ่าย</h2>
-    <p class="section-lede">ภาพรวมลำดับขั้นตอนตั้งแต่เริ่มปฏิบัติงานจนถึงการเบิกจ่ายงบประมาณ</p>
-    <ol class="process-list">
-      <li>
-        <span class="step-index">1</span>
-        <div>
-          <h3>ยื่นคำขอและหลักฐานการปฏิบัติงาน</h3>
-          <p>ผู้สอน/ผู้ช่วยสอน รวบรวมข้อมูลรายวิชา ภาคการศึกษา จำนวนชั่วโมงจริง และเอกสารประกอบ แล้วยื่นผ่านระบบ</p>
-        </div>
-      </li>
-      <li>
-        <span class="step-index">2</span>
-        <div>
-          <h3>เจ้าหน้าที่ตรวจสอบความถูกต้อง (Verification)</h3>
-          <p>ตรวจสิทธิ์ตามระเบียบ ความครบถ้วนของเอกสาร การนับชั่วโมงสอน และความซ้ำซ้อน ตรวจผ่านหรือส่งกลับแก้ไขพร้อมเหตุผล</p>
-        </div>
-      </li>
-      <li>
-        <span class="step-index">3</span>
-        <div>
-          <h3>ผู้อนุมัติพิจารณา (Approval)</h3>
-          <p>ผู้อนุมัติพิจารณาอนุมัติ ไม่อนุมัติ หรือส่งกลับ โดยไม่สามารถอนุมัติคำขอของตนเองได้</p>
-        </div>
-      </li>
-      <li>
-        <span class="step-index">4</span>
-        <div>
-          <h3>ดำเนินการเบิกจ่ายและบันทึกประวัติ (Disbursement)</h3>
-          <p>เบิกจ่ายจากเงินรายได้ของศูนย์ลำปาง ทุกการดำเนินการถูกบันทึกประวัติเพื่อตรวจสอบย้อนหลัง</p>
-        </div>
-      </li>
-    </ol>
-  </section>
-
-  <section id="documents" class="section wrap">
-    <h2><span class="num">04</span>เอกสารหลักฐานที่ต้องจัดเตรียม</h2>
-    <p class="section-lede">เอกสารประกอบสำคัญสำหรับการยื่นเรื่องเบิกจ่ายเงินค่าตอบแทน</p>
-    <div class="table-card">
-      <table>
-        <tbody>
-          <tr><td class="bullet">●</td><td><strong>แบบฟอร์มคำขอเบิกเงินค่าตอบแทน</strong> (ระบุรายวิชา, วันที่, ช่วงเวลา และจำนวนชั่วโมง)</td></tr>
-          <tr><td class="bullet">●</td><td><strong>ตารางสอน / ตารางการปฏิบัติงาน</strong> ที่ได้รับอนุมัติจากคณะหรือหน่วยงานต้นสังกัด</td></tr>
-          <tr><td class="bullet">●</td><td><strong>บันทึกเวลาปฏิบัติงาน / ใบลงเวลาสอน</strong> (ระบุเวลาเริ่ม-สิ้นสุดชัดเจน)</td></tr>
-          <tr><td class="bullet">●</td><td><strong>หนังสือเชิญ / คำสั่งแต่งตั้ง</strong> (กรณีผู้บรรยายพิเศษ หรืออาจารย์ที่เดินทางมาปฏิบัติงาน)</td></tr>
-        </tbody>
+        <thead>
+          <tr><th>รหัส</th><th>ผู้ขอ</th><th>ประเภท</th><th>วิชา</th><th>ชม.</th><th>ยอด</th><th>ดำเนินการ</th></tr>
+        </thead>
+        <tbody id="reviewRows"><tr><td colspan="7">กำลังโหลดข้อมูล...</td></tr></tbody>
       </table>
     </div>
   </section>
 
-  <section id="claim" class="section wrap" data-roles="Teacher TA" hidden>
-    <h2><span class="num">05</span>สร้างคำขอเบิกค่าตอบแทน</h2>
-    <p class="section-lede">กรอกข้อมูล แล้วเลือกบันทึกร่างหรือยื่นคำขอ ระบบจะตรวจกฎและคำนวณยอดให้ บทบาทของคุณถูกกำหนดจากบัญชีที่เข้าสู่ระบบ</p>
+  <section id="claim" class="section workspace" data-roles="Teacher TA" hidden>
+    <h2>สร้างคำขอเบิกค่าตอบแทน</h2>
+    <p class="section-lede">กรอกข้อมูล แล้วเลือกบันทึกร่างหรือยื่นคำขอ ระบบจะตรวจกฎและคำนวณยอดให้ ชื่อผู้ขอและบทบาทของคุณถูกกำหนดจากบัญชีที่เข้าสู่ระบบ</p>
 
     <div class="form-card">
-      <label>ชื่อผู้ขอเบิก
-        <input id="name" type="text" autocomplete="name">
-      </label>
+      <input id="name" type="hidden">
       <label>ประเภทค่าตอบแทน
         <select id="typeSelect"><option value="">กำลังโหลด...</option></select>
       </label>
@@ -192,8 +167,8 @@
     </div>
   </section>
 
-  <section id="claims" class="section wrap" data-roles="Teacher TA Officer Approver Admin Administrators" hidden>
-    <h2><span class="num">06</span>รายการคำขอ</h2>
+  <section id="claims" class="section workspace" data-roles="Teacher TA Officer Approver Admin Administrators" hidden>
+    <h2>รายการคำขอ</h2>
     <p class="section-lede">ผู้ขอเห็นเฉพาะคำขอของตนเอง เจ้าหน้าที่และผู้อนุมัติเห็นคำขอที่ยื่นแล้วทั้งหมด</p>
     <div class="filters">
       <select id="fTerm" aria-label="กรองตามภาคการศึกษา">
@@ -208,10 +183,9 @@
         <option value="SUBMITTED">ยื่นแล้ว</option>
         <option value="VERIFIED">ตรวจแล้ว</option>
         <option value="APPROVED">อนุมัติ</option>
+        <option value="PAID">จ่ายแล้ว</option>
         <option value="REJECTED">ไม่อนุมัติ</option>
         <option value="RETURNED">ส่งกลับแก้ไข</option>
-        <option value="SIGNED_DOCS_RECEIVED">บันทึกการรับหลักฐานแล้ว</option>
-        <option value="PAID">จ่ายแล้ว</option>
       </select>
     </div>
     <div class="table-card">
@@ -227,61 +201,125 @@
     </div>
   </section>
 
-  <section id="review" class="section wrap" data-roles="Officer Approver" hidden>
-    <h2><span class="num">07</span>คำขอรอตรวจสอบ/อนุมัติ</h2>
-    <p class="section-lede">เจ้าหน้าที่เห็นคำขอที่ยื่นแล้ว ผู้อนุมัติเห็นคำขอที่ตรวจผ่านแล้ว การส่งกลับหรือไม่อนุมัติต้องระบุเหตุผล</p>
-    <div class="table-card">
-      <table>
-        <thead>
-          <tr><th>รหัส</th><th>ผู้ขอ</th><th>ประเภท</th><th>วิชา</th><th>ชม.</th><th>ยอด</th><th>ดำเนินการ</th></tr>
-        </thead>
-        <tbody id="reviewRows"><tr><td colspan="7">กำลังโหลดข้อมูล...</td></tr></tbody>
-      </table>
-    </div>
-  </section>
+  <section id="bank" class="section workspace" data-roles="Teacher TA" hidden>
+    <h2>บัญชีรับเงินของฉัน</h2>
+    <p class="section-lede">บันทึกบัญชีปลายทางที่จะรับค่าตอบแทน ระบบเก็บและแสดงเฉพาะเลขแบบปกปิด (เช่น xxx-x-x1234-x) เจ้าหน้าที่การเงินเห็นเฉพาะบัญชีของผู้ขอที่ได้รับอนุมัติ ในการทดสอบให้ใช้เลขจำลองเท่านั้น</p>
 
-  <section id="bank" class="section wrap" data-roles="Teacher TA" hidden>
-    <h2><span class="num">08</span>บัญชีรับเงินของฉัน</h2>
-    <p class="section-lede">ระบบเก็บเฉพาะเลขบัญชีแบบปกปิด ผู้อื่นเห็นได้เฉพาะฝ่ายการเงินตอนจ่าย</p>
     <div class="form-card">
-      <p id="bankCurrent" class="msg">กำลังโหลด...</p>
-      <label>ธนาคาร <input id="bankCode" type="text" placeholder="เช่น BANK-A"></label>
-      <label>เลขบัญชี <input id="bankNumber" type="text" inputmode="numeric" autocomplete="off" placeholder="10-12 หลัก"></label>
-      <label>ชื่อบัญชี <input id="bankName" type="text"></label>
-      <div class="actions"><button id="btnSaveBank" class="btn" type="button">บันทึกบัญชี</button></div>
+      <label>รหัสธนาคาร
+        <input id="bankCode" type="text" placeholder="เช่น BANK-A" maxlength="20" autocomplete="off">
+      </label>
+      <label>เลขบัญชี
+        <input id="bankNumber" type="text" inputmode="numeric" placeholder="เช่น xxx-x-x1234-x (เลขจำลอง)" maxlength="20" autocomplete="off">
+      </label>
+      <label>ชื่อบัญชี
+        <input id="bankName" type="text" maxlength="100" autocomplete="off">
+      </label>
+      <p id="bankCurrent" class="estimate">กำลังโหลดข้อมูลบัญชี...</p>
+      <div class="actions">
+        <button id="btnSaveBank" class="btn" type="button">บันทึกบัญชี</button>
+      </div>
       <p id="bankMsg" class="msg" role="status"></p>
     </div>
   </section>
 
-  <section id="course" class="section wrap" data-roles="Teacher Staff Officer Approver Admin Administrators" hidden>
-    <h2><span class="num">09</span>สรุปชั่วโมงรายวิชาตามรอบเบิก</h2>
-    <p class="section-lede">เทียบคาบสอนตามตารางกับคำขอเบิกในรอบเดียวกัน คาบหนึ่งนับได้ครั้งเดียว อาจารย์เห็นเฉพาะรายวิชาของตนเอง</p>
-    <div class="filters">
-      <input id="courseId" class="filters-input" value="CS361-SP-1-2569" aria-label="รหัสรายวิชา">
-      <select id="courseRound" aria-label="รอบเบิก">
-        <option>OCT-2569</option><option>SEP-2569</option><option>NOV-2569</option><option value="">ทุกรอบ</option>
-      </select>
-      <button id="btnCourse" class="btn small" type="button">แสดง</button>
-    </div>
-    <div id="courseBox"></div>
-  </section>
-
-  <section id="assist" class="section wrap" data-roles="Student Teacher Staff Admin Administrators" hidden>
-    <h2><span class="num">10</span>ชั่วโมงนักศึกษาช่วยงาน</h2>
-    <p class="section-lede">ชั่วโมงที่กรอก / รับรอง / รอตรวจ แยกกัน การกดรับรองในระบบไม่ใช่ลายเซ็นจริง เจ้าหน้าที่ออกเอกสารให้อาจารย์ลงนามบนกระดาษ แล้วบันทึกการรับหลักฐาน</p>
+  <section id="rates" class="section wrap">
+    <h2>ประเภทและอัตราค่าตอบแทน</h2>
+    <p class="section-lede">ข้อมูลดึงจากฐานข้อมูลกฎ จึงเพิ่มหรือปรับประเภทค่าตอบแทนได้โดยไม่ต้องแก้โค้ด</p>
     <div class="table-card">
       <table>
-        <thead><tr><th>นักศึกษา</th><th>รายวิชา</th><th>กรอก</th><th>รับรอง</th><th>รอตรวจ</th><th>สถานะ</th><th>หลักฐาน</th><th>ดำเนินการ</th></tr></thead>
-        <tbody id="assistRows"><tr><td colspan="8">กำลังโหลดข้อมูล...</td></tr></tbody>
+        <thead><tr><th>ประเภท</th><th>ผู้มีสิทธิ์</th><th>เอกสารที่ต้องแนบ</th><th>อัตรา</th></tr></thead>
+        <tbody id="typeRows"><tr><td colspan="4">กำลังโหลดข้อมูล..</td></tr></tbody>
       </table>
+    </div>
+    <div class="type-grid">
+      <article class="type-card">
+        <span class="type-tag">กระทรวงการคลัง (ระดับ ป.ตรี)</span>
+        <h3>ค่าสอนพิเศษ ปริญญาตรี</h3>
+        <p>อัตราชั่วโมงละ <strong>๔๐๐ บาท</strong></p>
+      </article>
+      <article class="type-card">
+        <span class="type-tag">กระทรวงการคลัง (ระดับบัณฑิตศึกษา)</span>
+        <h3>ค่าสอนพิเศษ บัณฑิตศึกษา</h3>
+        <p>อัตราชั่วโมงละ <strong>๕๔๐ บาท</strong></p>
+      </article>
+      <article class="type-card">
+        <span class="type-tag">ผู้ทรงคุณวุฒิภายนอก</span>
+        <h3>อาจารย์พิเศษภายนอก</h3>
+        <p>มิได้เป็นข้าราชการ/พนักงานรัฐวิสาหกิจ ได้รับเพิ่มอีก <strong>๑ เท่า</strong></p>
+      </article>
     </div>
   </section>
 
-  <section id="admin" class="section wrap" data-roles="Admin Administrators" hidden>
-    <h2><span class="num">11</span>ข้อมูลทดสอบ</h2>
-    <p class="section-lede">รีเซ็ตเฉพาะข้อมูลทดสอบกลับ baseline ไม่แตะคำขอจริงอื่น</p>
-    <button id="btnReset" class="btn ghost" type="button">รีเซ็ตข้อมูลทดสอบ</button>
-    <p id="resetMsg" class="msg" role="status"></p>
+  <section id="rules" class="section wrap">
+    <h2>เกณฑ์การนับหน่วยชั่วโมงการสอน</h2>
+    <p class="section-lede">เงื่อนไขและระยะเวลาในการคำนวณเงินค่าตอบแทนตามประเภทการสอน</p>
+    <div class="type-grid">
+      <article class="type-card">
+        <span class="type-tag">ภาคทฤษฎี</span>
+        <h3>การสอนภาคทฤษฎี</h3>
+        <p>การบรรยาย สัมมนา อภิปราย ใน <strong>๑ ชั่วโมง ต้องใช้เวลาสอนไม่น้อยกว่า ๕๐ นาที</strong> ได้รับเงินค่าตอบแทนเท่ากับ <strong>๑ ชั่วโมง</strong></p>
+      </article>
+      <article class="type-card">
+        <span class="type-tag">ภาคปฏิบัติ</span>
+        <h3>การสอนภาคปฏิบัติ</h3>
+        <p>การควบคุมห้องแล็บ/ฝึกงานอย่างใกล้ชิด กำหนดให้การสอนภาคปฏิบัติ <strong>๒ ชั่วโมง คิดเป็นเงินค่าตอบแทนเท่ากับ ๑ ชั่วโมง</strong></p>
+      </article>
+    </div>
+    <div class="note-box">
+      <h4>ข้อกำหนดเรื่องคาบเวลา</h4>
+      <p>คำว่า <strong>"๑ คาบเวลา"</strong> หมายถึง เวลาที่ปฏิบัติหน้าที่ติดต่อกัน <strong>ไม่น้อยกว่า ๓ ชั่วโมง</strong></p>
+    </div>
+  </section>
+
+  <section id="process" class="section wrap">
+    <h2>ขั้นตอนกระบวนการเบิกจ่าย</h2>
+    <p class="section-lede">ภาพรวมลำดับขั้นตอนตั้งแต่เริ่มปฏิบัติงานจนถึงการเบิกจ่ายงบประมาณ</p>
+    <ol class="process-list">
+      <li>
+        <span class="step-index">1</span>
+        <div>
+          <h3>ยื่นคำขอและหลักฐานการปฏิบัติงาน</h3>
+          <p>ผู้สอน/ผู้ช่วยสอน รวบรวมข้อมูลรายวิชา ภาคการศึกษา จำนวนชั่วโมงจริง และเอกสารประกอบ แล้วยื่นผ่านระบบ</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-index">2</span>
+        <div>
+          <h3>เจ้าหน้าที่ตรวจสอบความถูกต้อง (Verification)</h3>
+          <p>ตรวจสิทธิ์ตามระเบียบ ความครบถ้วนของเอกสาร การนับชั่วโมงสอน และความซ้ำซ้อน ตรวจผ่านหรือส่งกลับแก้ไขพร้อมเหตุผล</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-index">3</span>
+        <div>
+          <h3>ผู้อนุมัติพิจารณา (Approval)</h3>
+          <p>ผู้อนุมัติพิจารณาอนุมัติ ไม่อนุมัติ หรือส่งกลับ โดยไม่สามารถอนุมัติคำขอของตนเองได้</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-index">4</span>
+        <div>
+          <h3>ดำเนินการเบิกจ่ายและบันทึกประวัติ (Disbursement)</h3>
+          <p>เบิกจ่ายจากเงินรายได้ของศูนย์ลำปาง ทุกการดำเนินการถูกบันทึกประวัติเพื่อตรวจสอบย้อนหลัง</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="documents" class="section wrap">
+    <h2>เอกสารหลักฐานที่ต้องจัดเตรียม</h2>
+    <p class="section-lede">เอกสารประกอบสำคัญสำหรับการยื่นเรื่องเบิกจ่ายเงินค่าตอบแทน</p>
+    <div class="table-card">
+      <table>
+        <tbody>
+          <tr><td class="bullet">●</td><td><strong>แบบฟอร์มคำขอเบิกเงินค่าตอบแทน</strong> (ระบุรายวิชา, วันที่, ช่วงเวลา และจำนวนชั่วโมง)</td></tr>
+          <tr><td class="bullet">●</td><td><strong>ตารางสอน / ตารางการปฏิบัติงาน</strong> ที่ได้รับอนุมัติจากคณะหรือหน่วยงานต้นสังกัด</td></tr>
+          <tr><td class="bullet">●</td><td><strong>บันทึกเวลาปฏิบัติงาน / ใบลงเวลาสอน</strong> (ระบุเวลาเริ่ม-สิ้นสุดชัดเจน)</td></tr>
+          <tr><td class="bullet">●</td><td><strong>หนังสือเชิญ / คำสั่งแต่งตั้ง</strong> (กรณีผู้บรรยายพิเศษ หรืออาจารย์ที่เดินทางมาปฏิบัติงาน)</td></tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
 </main>
@@ -313,13 +351,7 @@
   <p id="paymentMsg" class="msg"></p>
 </dialog>
 
-<style>
-  /* สไตล์เสริมสำหรับ Modal */
-  .modal-dialog { border: none; border-radius: 8px; padding: 20px; max-width: 500px; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-  .modal-dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
-  .bank-info-box { background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #ddd; }
-  .bank-info-box p { margin: 5px 0; }
-</style>
+<noscript><p class="wrap section-lede">ต้องเปิดใช้งาน JavaScript เพื่อใช้งานระบบนี้</p></noscript>
 
 <footer class="site-footer">
   <div class="wrap">
@@ -330,6 +362,6 @@
 <script src="js/auth.js"></script>
 <script src="js/app.js"></script>
 <script src="js/review.js"></script>
-<script src="js/v3.js"></script>
+<script src="js/ui.js"></script>
 </body>
 </html>
