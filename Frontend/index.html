@@ -108,10 +108,23 @@
   <section id="review" class="section workspace" data-roles="Officer Approver" hidden>
     <h2>คำขอรอตรวจสอบ/อนุมัติ</h2>
     <p class="section-lede">เจ้าหน้าที่เห็นคำขอที่ยื่นแล้ว ผู้อนุมัติเห็นคำขอที่ตรวจผ่านแล้ว การส่งกลับหรือไม่อนุมัติต้องระบุเหตุผล</p>
+    <div class="dynamic-filter-bar">
+      <div id="activeFilters" class="active-filters-container"></div>
+      <div class="add-filter-dropdown">
+        <button type="button" class="btn ghost small" id="btnAddFilter">+ เพิ่มตัวกรอง</button>
+        <div id="filterMenu" class="filter-menu" hidden>
+          <button type="button" data-type="type">ประเภทคำขอ</button>
+          <button type="button" data-type="term">ภาคการศึกษา</button>
+          <button type="button" data-type="dateRange">ช่วงวันที่ปฏิบัติงาน</button>
+          <button type="button" data-type="role">ผู้ขอ (TA / Teacher)</button>
+        </div>
+      </div>
+    </div>
+
     <div class="table-card">
       <table>
         <thead>
-          <tr><th>รหัส</th><th>ผู้ขอ</th><th>ประเภท</th><th>วิชา</th><th>ชม.</th><th>ยอด</th><th>ดำเนินการ</th></tr>
+          <tr><th>รหัส</th><th>ผู้ขอ</th><th>ประเภท</th><th>วิชา</th><th>ภาค</th><th>ชม.</th><th>ยอด</th><th>ไฟล์แนบ</th><th>ดำเนินการ</th></tr>
         </thead>
         <tbody id="reviewRows"><tr><td colspan="7">กำลังโหลดข้อมูล...</td></tr></tbody>
       </table>
@@ -177,6 +190,11 @@
         <option>2/2569</option>
         <option>ฤดูร้อน/2569</option>
       </select>
+
+      <select id="fType" aria-label="กรองตามประเภทค่าตอบแทน">
+        <option value="">ทุกประเภท</option>
+      </select>
+
       <select id="fStatus" aria-label="กรองตามสถานะ">
         <option value="">ทุกสถานะ</option>
         <option value="DRAFT">ร่าง</option>
@@ -200,6 +218,8 @@
       </table>
     </div>
   </section>
+
+
 
   <section id="bank" class="section workspace" data-roles="Teacher TA" hidden>
     <h2>บัญชีรับเงินของฉัน</h2>

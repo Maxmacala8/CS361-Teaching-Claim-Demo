@@ -34,9 +34,17 @@ async function api(path, opts) {
 async function loadTypes() {
   try {
     types = await api("/types");
-    $("typeSelect").innerHTML =
-      '<option value="">เลือกประเภท</option>' +
-      types.map((t) => `<option value="${escapeHtml(t.typeId)}">${escapeHtml(t.name)}</option>`).join("");
+    const optionsHtml = types.map((t) => `<option value="${escapeHtml(t.typeId)}">${escapeHtml(t.name)}</option>`).join("");
+    // ใส่ใน Form ยื่นคำขอ
+    $("typeSelect").innerHTML = '<option value="">เลือกประเภท</option>' + optionsHtml;
+    
+    // 🟢 ใส่ใน Filter รายการคำขอ
+    if ($("fType")) {
+      $("fType").innerHTML = '<option value="">ทุกประเภท</option>' + optionsHtml;
+    }
+    // $("typeSelect").innerHTML =
+    //   '<option value="">เลือกประเภท</option>' +
+    //   types.map((t) => `<option value="${escapeHtml(t.typeId)}">${escapeHtml(t.name)}</option>`).join("");
     $("typeRows").innerHTML = types
       .map((t) => `<tr><td><strong>${escapeHtml(t.name)}</strong></td>
         <td>${escapeHtml(t.roles.join(", "))}</td>
@@ -140,16 +148,30 @@ function getFileIcon(name) {
 // ---------- รายการคำขอ ----------
 async function loadClaims() {
   const q = new URLSearchParams();
-  if ($("fTerm").value) q.set("term", $("fTerm").value);
-  if ($("fStatus").value) q.set("status", $("fStatus").value);
+  if ($("fTerm") && $("fTerm").value) q.set("term", $("fTerm").value);
+  if ($("fStatus") && $("fStatus").value) q.set("status", $("fStatus").value);
+
   try {
-    const rows = await api("/claims?" + q);
+    let rows = await api("/claims?" + q);
+
+    // กรองประเภทคำขอฝั่ง Client (กรณีเลือกระบุ fType)
+    const selectedType = $("fType") ? $("fType").value : "";
+    if (selectedType) {
+      rows = rows.filter((c) => String(c.typeId) === String(selectedType));
+    }
+
     globalClaims = rows;
-    $("claimRows").innerHTML = rows.length
-      ? rows.map(claimRow).join("")
-      : '<tr><td colspan="10">ยังไม่มีคำขอ</td></tr>';
+
+    const tbody = $("claimRows");
+    if (tbody) {
+      tbody.innerHTML = rows.length
+        ? rows.map(claimRow).join("")
+        : '<tr><td colspan="10" style="text-align:center;">ยังไม่มีคำขอ</td></tr>';
+    }
   } catch (e) {
-    $("claimRows").innerHTML = `<tr><td colspan="10">โหลดข้อมูลไม่ได้: ${escapeHtml(e.message)}</td></tr>`;
+    if ($("claimRows")) {
+      $("claimRows").innerHTML = `<tr><td colspan="10">โหลดข้อมูลไม่ได้: ${escapeHtml(e.message)}</td></tr>`;
+    }
   }
 }
 
@@ -377,8 +399,9 @@ $("typeSelect").addEventListener("change", preview);
 $("btnDraft").addEventListener("click", () => submitClaim("DRAFT"));
 $("btnSubmit").addEventListener("click", () => submitClaim("SUBMITTED"));
 $("btnCancel").addEventListener("click", () => resetForm());
-$("fTerm").addEventListener("change", loadClaims);
-$("fStatus").addEventListener("change", loadClaims);
+$("fTerm")?.addEventListener("change", loadClaims);
+$("fType")?.addEventListener("change", loadClaims);
+$("fStatus")?.addEventListener("change", loadClaims);
 
 // ---------- บัญชีรับเงินของฉัน (ระบบเก็บเฉพาะเลขแบบปกปิด) ----------
 function showMyBank(b) {
@@ -425,6 +448,163 @@ $("btnSaveBank").addEventListener("click", async () => {
 });
 
 document.addEventListener("auth-ready", () => { if (ME) loadMyBank(); });
+
+//filter try
+let filterMasters = {
+  types: [],
+  terms: [],
+  roles: []
+};
+function buildFilterMastersFromData(claims) {
+  if (!Array.isArray(claims)) return;
+
+  // 1. ดึงประเภทคำขอที่ไม่ซ้ำกัน
+  const typesMap = new Map();
+  claims.forEach((c) => {
+    if (c.typeId && c.typeName) typesMap.set(String(c.typeId), c.typeName);
+  });
+  filterMasters.types = Array.from(typesMap.entries()).map(([id, label]) => ({ id, label }));
+
+  // 2. ดึงภาคการศึกษาที่ไม่ซ้ำกัน
+  const uniqueTerms = [...new Set(claims.map((c) => c.term).filter(Boolean))];
+  filterMasters.terms = uniqueTerms.map((t) => ({ id: t, label: t }));
+
+  // 3. ดึงบทบาทผู้ขอ (role) ที่ได้จาก DynamoDB ไม่ให้ซ้ำกัน
+  const uniqueRoles = [...new Set(claims.map((c) => c.role).filter(Boolean))];
+  filterMasters.roles = uniqueRoles.map((r) => ({
+    id: r,
+    label: r === "TA" ? "ผู้ช่วยสอน (TA)" : `อาจารย์ (${r})`,
+  }));
+}
+$("btnAddFilter")?.addEventListener("click", () => {
+  const menu = $("filterMenu");
+  if (menu) menu.hidden = !menu.hidden;
+});
+
+// 2. เมื่อคลิกเลือกประเภทตัวกรองในเมนู
+$("filterMenu")?.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-type]");
+  if (btn) {
+    addFilterItem(btn.dataset.type);
+    $("filterMenu").hidden = true; // ปิดเมนูหลังเลือกเสร็จ
+  }
+});
+function onFilterChange() {
+  if (typeof applyDynamicFilters === "function") applyDynamicFilters();
+  if (typeof applyReviewFilters === "function") applyReviewFilters();
+}
+// 3. ฟังก์ชันสร้างชิปตัวกรองเพิ่มลงในหน้าจอ
+function addFilterItem(filterType) {
+  const filterId = "filter_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6);
+  const container = $("activeFilters");
+  if (!container) return;
+
+  const itemEl = document.createElement("div");
+  itemEl.className = "filter-chip";
+  itemEl.dataset.id = filterId;
+  itemEl.dataset.type = filterType;
+
+  let inputHtml = "";
+
+  // ดึงตัวเลือกจาก filterMasters ที่สกัดไว้
+  if (filterType === "type") {
+    const opts = filterMasters.types.map(t => `<option value="${t.id}">${escapeHtml(t.label)}</option>`).join("");
+    inputHtml = `<label>ประเภท: <select class="f-val"><option value="">ทั้งหมด</option>${opts}</select></label>`;
+  } 
+  else if (filterType === "term") {
+    const opts = filterMasters.terms.map(t => `<option value="${t.id}">${escapeHtml(t.label)}</option>`).join("");
+    inputHtml = `<label>ภาค: <select class="f-val"><option value="">ทั้งหมด</option>${opts}</select></label>`;
+  } 
+  else if (filterType === "role") {
+    const opts = filterMasters.roles.map(r => `<option value="${r.id}">${escapeHtml(r.label)}</option>`).join("");
+    inputHtml = `<label>ผู้ขอ: <select class="f-val"><option value="">ทั้งหมด</option>${opts}</select></label>`;
+  } 
+  else if (filterType === "dateRange") {
+    inputHtml = `<label>ช่วงวันที่: <input type="date" class="f-date-from"> ถึง <input type="date" class="f-date-to"></label>`;
+  }
+
+  itemEl.innerHTML = `
+    ${inputHtml}
+    <button type="button" class="btn-remove-filter" onclick="removeFilterItem('${filterId}')">✕</button>
+  `;
+
+  container.appendChild(itemEl);
+
+  // เมื่อเปลี่ยนค่าใน dropdown หรือวันที่ ให้สั่งกรองข้อมูลทันที
+  itemEl.querySelectorAll("select, input").forEach((el) => {
+    el.addEventListener("change", () => {
+      if (typeof applyReviewFilters === "function") applyReviewFilters();
+    });
+  });
+
+  if (typeof applyReviewFilters === "function") applyReviewFilters();
+}
+
+// 4. ฟังก์ชันลบชิปตัวกรองออก
+window.removeFilterItem = function (filterId) {
+  const el = document.querySelector(`[data-id="${filterId}"]`);
+  if (el) {
+    el.remove();
+    if (typeof applyReviewFilters === "function") applyReviewFilters();
+  }
+};
+function applyDynamicFilters() {
+  const container = $("activeFilters");
+  if (!container) return;
+
+  const filterElements = container.querySelectorAll(".filter-chip");
+  const activeFilters = [];
+
+  // อ่านค่าจากทุก ชิปตัวกรอง ที่ถูกสร้างบน UI
+  filterElements.forEach((el) => {
+    const type = el.dataset.type;
+    if (type === "dateRange") {
+      const from = el.querySelector(".f-date-from")?.value;
+      const to = el.querySelector(".f-date-to")?.value;
+      if (from || to) activeFilters.push({ type, from, to });
+    } else {
+      const val = el.querySelector(".f-val")?.value;
+      if (val) activeFilters.push({ type, value: val });
+    }
+  });
+
+  // นำข้อมูลคำขอทั้งหมดมาเตรียมกรอง
+  let filtered = [...globalClaims];
+
+  // 1) กรองตาม ประเภท, ภาคการศึกษา, บทบาท (เงื่อนไข AND - ต้องตรงตามที่เลือก)
+  activeFilters.forEach((f) => {
+    if (f.type === "type") {
+      filtered = filtered.filter((c) => String(c.typeId) === String(f.value));
+    } else if (f.type === "term") {
+      filtered = filtered.filter((c) => c.term === f.value);
+    } else if (f.type === "role") {
+      filtered = filtered.filter((c) => c.role === f.value);
+    }
+  });
+
+  // 2) กรองตามช่วงวันที่ (เงื่อนไข OR - หากเพิ่มช่วงวันที่หลายอัน ซ้ำกัน ถ้าตรงช่วงใดช่วงหนึ่งจะแสดงผลทันที)
+  const dateFilters = activeFilters.filter((f) => f.type === "dateRange");
+  if (dateFilters.length > 0) {
+    filtered = filtered.filter((c) => {
+      const claimDate = c.date;
+      if (!claimDate) return true;
+
+      return dateFilters.some((df) => {
+        const afterFrom = !df.from || claimDate >= df.from;
+        const beforeTo = !df.to || claimDate <= df.to;
+        return afterFrom && beforeTo;
+      });
+    });
+  }
+
+  // วาดผลลัพธ์ลงตารางรายการคำขอ (#claimRows)
+  const tbody = $("claimRows");
+  if (tbody) {
+    tbody.innerHTML = filtered.length
+      ? filtered.map(claimRow).join("")
+      : '<tr><td colspan="10" style="text-align:center;">ไม่พบข้อมูลที่ตรงกับตัวกรอง</td></tr>';
+  }
+}
 
 // loadClaims() / loadReview() ถูกเรียกใน review.js ตอน auth-ready
 loadTypes();
